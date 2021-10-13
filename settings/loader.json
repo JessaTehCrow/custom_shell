@@ -1,0 +1,23 @@
+{
+    "test": {
+        "main": "Non default message"
+    },
+    "shell": {
+        "main": "$dir$ > "
+    },
+    "json_loader": {
+        "directories": {
+            "base": "D:/documents/programming/python/projects/better_shell",
+            "py": "D:/documents/programming/python",
+            "desktop": "C:/users/jessa/desktop",
+            "minecraft": "C:/Users/Jessa/AppData/Roaming/.minecraft",
+            "site-packages": "C:/Users/Jessa/AppData/Local/Programs/Python/Python38/Lib/site-packages",
+            "pyline": "D:/documents/programming/python/projects/pyline"
+        },
+        "colors": {
+            "name": "[GR]",
+            "directory": "[P]"
+        },
+        "main": "Default message"
+    }
+}
