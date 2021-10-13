@@ -26,7 +26,7 @@ class color:
 
 colors = {}
 
-#made this like 2 years ago, no judge pls
+#i made most of this like 2 years ago, no judge pls
 for x in color.__dict__:
     if not x.endswith("_"):
         exec(f"colors['[{x}]'] = color.{x}")

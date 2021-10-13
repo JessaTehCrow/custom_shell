@@ -68,7 +68,6 @@ class _loader():
 
 def on_ready(self):
     self.loader = _loader(self)
-    print("Loaded json_loader")
 
 def refresh(self):
     "Refresh json data with file"
