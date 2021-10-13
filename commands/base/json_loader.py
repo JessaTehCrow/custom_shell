@@ -27,12 +27,12 @@ class _loader():
         except json.decoder.JSONDecodeError:
             return rewrite()
 
-    def get_module(self):
+    def _get_module(self):
         return sys._getframe().f_back.f_code.co_filename.split('\\')[-1].split('.')[0]
 
     def load(self,default,sub:str='main',_name:str=None):
         "Returns json data for module, saves default if it doesn't exist"
-        module_name = _name or self.get_module()
+        module_name = _name or self._get_module()
 
         #check if module in data and if sub-name in data[module]
         if not module_name in self._json_data or not sub in self._json_data[module_name]:
@@ -54,7 +54,7 @@ class _loader():
     
     def save(self,default,sub:str="main",_name:str=None):
         "Save data to disk"
-        module = _name or self.get_module()
+        module = _name or self._get_module()
 
         #Check if module in data
         if not module in self._json_data:

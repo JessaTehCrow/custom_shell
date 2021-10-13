@@ -229,6 +229,10 @@ def hide(*path:str, silent:bool=False):
     __help__ = "[B]path [G]is the path to the file or folder from current directory"
 
     tohide = f"attrib +h {' '.join(path)}"
+    if not os.path.isfile(' '.join(path)):
+        cprint(f"[R]File not found")
+        return 2
+
     os.system(tohide)
     if not silent:
         cprint(f'[GR]Succesfully hidden {" ".join(path)}')
@@ -236,6 +240,10 @@ def hide(*path:str, silent:bool=False):
 def unhide(*path:str, silent:bool=False):
     "Unhide a hidden folder or file"
     __help__ = "[B]path [G]is the path to the file or folder from current directory"
+
+    if not os.path.isfile(' '.join(path)):
+        cprint(f"[R]File not found")
+        return 2
 
     os.system(f"attrib -h {' '.join(path)}")
     if not silent:

@@ -3,15 +3,13 @@ import os
 
 shell = shell()
 
-default = "$dir$ > "
+default = "[G]$dir$ [E]> [GR] "
 
-def do():
-    pass
+data = shell.loader.load(default, _name="shell ")
 
-data = shell.loader.load(default,_name="shell")
 while 1:
     try:
-        cmd = input(cconvert("[L]($dir$) [P]Jessa [R]: [G]".replace("$dir$",os.getcwd().replace("\\","/"))))
+        cmd = input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))))
         if len(cmd)==0: continue
         shell.run(cmd.split())
 

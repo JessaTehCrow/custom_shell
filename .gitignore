@@ -8,5 +8,4 @@ utils/__pycache__
 
 # settings
 settings/*
-!settings/shell.json
 !settings/pre_import.json
