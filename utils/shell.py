@@ -210,7 +210,8 @@ class shell():
             return 1
         
         #Get module functions and description
-        funcs,desc,long_desc = shell.get_functions(file, imlib)
+
+        funcs = shell.get_functions(file)
         
         #Load data
         data = {}
@@ -224,6 +225,12 @@ class shell():
             data[f[0]] = function(getattr(imlib,f[0]),*f)
             self.do_event("on_load")
         key = pyname
+        desc, long_desc = "",""
+
+        if hasattr(imlib,"__desc__"):
+            desc = getattr(imlib,"__desc__")
+        if hasattr(imlib,"__long_desc__"):
+            long_desc = getattr(imlib,"__long_desc__")
 
         #Check if module needs to be pre-loaded
         if pyname in pre: key = "pre"
@@ -252,7 +259,7 @@ class shell():
         self.do_event("on_shell_ready")
 
     @staticmethod
-    def get_functions(directory, module):
+    def get_functions(directory):
         "Get data from function"
         pyname = directory.split('/')[-1].split('.')[0]
         def top_level_functions(body):
@@ -276,28 +283,8 @@ class shell():
             for default in defaults:
                 if default.col_offset == arg.end_col_offset+1: return default.value
 
-        def get_descr(parsed, v_name="__desc__"): #Get module description
-            for line in parsed.body:
-                if isinstance(line,ast.Assign) and any(isinstance(line.value, t) for t in [ast.Constant,ast.JoinedStr]):
-                    name = line.targets[0].id
-                    if isinstance(line.value, ast.JoinedStr):
-                        value = get_joined_str(line.value.values,module)
-                    else:
-                        value = line.value.value
-                    if not value: continue
-                    if name == v_name and isinstance(value,str): return value.replace('\n', '\n ')
-        
-        def get_joined_str(array:list, module):
-            out = ""
-            for x in array:
-                if isinstance(x,ast.Constant):
-                    out += x.value
-                elif isinstance(x,ast.FormattedValue):
-                    out += str(module.__getattribute__(x.value.id))
-            return out
-
         parsed = parse_ast(directory)
         funcs = top_level_functions(parsed.body)
 
         #Make and return list of it all
-        return [[f.name,get_args(f),get_desc(f.body),get_help(f.body),pyname] for f in funcs if not f.name.startswith("_")],get_descr(parsed),get_descr(parsed,'__long_desc__')
+        return [[f.name,get_args(f),get_desc(f.body),get_help(f.body),pyname] for f in funcs if not f.name.startswith("_")]
