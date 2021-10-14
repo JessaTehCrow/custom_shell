@@ -5,7 +5,7 @@ In this file we will be noting the documentation on how to use and make things f
 Contents:
 - [Installing](#installing)
 - [Shell object](#shell-object)
-- [Custom scripts](#custom-scripts)
+- [Custom modules](#custom-modules)
 - [Build-in modules](#build-in-modules)
 - Others
 
@@ -17,6 +17,18 @@ ___
 
 The `Shell` object has multiple functionalities, other than just working as a shell.
 Your scripts can communicate with the shell object, but it's optional for custom functions.
+
+### Usable functions
+
+The shell has 1 function you can use, `run`
+
+**Run**
+The shell has a function called `run`, which takes 2 arguments `command` and `help_if_error`.
+
+`command` is just the command you want to be run in the form of a splitted string.
+for example, if you want to run `help example test`, you should pass that as `["help","example","test"]`. 
+
+`help_if_error` is a boolean value, default is `True`. This just runs the help command for the given command (or none if it's a system command). Recommended to set this to false if you're running commands through a function. 
 
 ### Event functions
 
@@ -54,17 +66,6 @@ def some_custom_function(self):
 
 this is handy if you want to add or use things within the shell object itself.
 
-### Running commands
-
-The shell has a function called `run`, which takes 2 arguments `command` and `help_if_error`.
-
-**Command**
-Command is just the command you want to be run in the form of a splitted string.
-for example, if you want to run `help example test`, you should pass that as `["help","example","test"]`. 
-
-**help if error**
-This is a boolean value, default is `True`. This just runs the help command for the given command (or none if it's a system command). Recommended to set this to false if you're running commands through a function. 
-
 ### Module injecting
 
 You can insert certain functions, or classes into the shell, so other modules are able to use them aswell. This can be done fairly easy aswell.
@@ -83,20 +84,91 @@ def on_ready(self):
 Check `json_loader.py` in `/commands/base/` for an example.
 
 ___
-## Custom Scripts
+## Custom Modules
 
-Custom scripts are fun ;D
+Custom modules are easy to make with this shell.
+
+### Getting started
+
+The first step to make your own module, is to make a new file.
+This file should be made in `commands/custom/`. You can name it anything you want (but you should make sure it's not already used, in `commands/base`). It's file extention has to be `.py`.
+
+For example: `new_module.py`.
+
+Once you made this, you can use the command `refresh` to load it into the shell. Once it's loaded, you can reload the module using the command `reload [module name]`.
+
+### Code
+
+**Base**
+To make a functional command, all you need to do is add a function to it.
+```py
+# new_module.py
+
+def new_command():
+    print("Command works!")
+```
+After adding the function, you can reload the module and then you can run the command as such: `new_module new_command`, and it'll run!
+
+**Arguments**
+Adding arguments to your commands work the exact same way with normal functions. 
+
+The only difference is that if you use type-hinting for the arguments, the shell will check if those arguments fit the type hints, and will automatically change the argument into the type.
+
+so if i have a function like this:
+```py
+def double(number : float):
+    print(f"The double of {number} is {number*2}")
+```
+and run it like you would with other commands (`module double 30`), it'll automatically feed number as a float, so you don't have to cast it to the type yourself.
+
+**Returns**
+All functions used by the shell have an exit code, this is either `0`, `1` or `2`
+
+An exit-code of `0` means there was no problem running the command, this is also the default code for if your function does not return any of them.
+
+An exit code of `1` means that there was a problem running the command, and is user-error, which will cause the shell to print the hell for that function (Unless `help_if_error` is set to false).
+
+An exit code of `2` means that there was something wrong, but the help will not be shown. Usefull for if there went something wrong that the user couldn't do anything about (For example: Failing to ping a host)
+
+**help & description**
+All functions should have a help and a description. Fortunately the build in help-command does most of the work for the help section.
+
+
+The shell will read all functions within a module, and will look at the name, arguments and argument type-hints. From this it'll generate a easy to read over-view of the function.
+
+The help will still need a user-defined help description however.
+This can be added by making a variable named `__help__` within the function. 
+```py
+def some_example(number : int):
+    __help__ = "The variable 'number' is a integer"
+    print(number*number)
+```
+This will be added to the detailed help section automatically aswell.
+(The detailed help is only shown if a specific function is given. For example `help module function`)
+
+Adding a description is the same as adding a description to a function normally is. This will be shown with the module help. for example `help module` as well as with the detailed help.
+
+```py
+def some_example(number : int):
+    """Prints the input number squared"""
+
+    __help__ = "The variable 'number' is a integer"
+    print(number*number)
+```
+this would be the final version of the function.
+Like stated before, you don't need to check if number is actually an integer, the shell takes care of that.
+
 ___
 ## Build-in modules
 
 ### Json loader
 
-The `Json loader` module inserts itself within the shell, making it accessable using `self.loader` within any module function.
+The `Json loader` module inserts itself within the shell, making it accessable using `shell.loader` within any module function.
 The loader saves all it's settings to `/settings/loader.json`, there you can change the values of sertain things in order to make work / look like you want it to.
 
 #### loader.load()
 
-The `self.loader.load()` has 3 parameters. `default`, `sub` and `_name`. 
+The `shell.loader.load()` has 3 parameters. `default`, `sub` and `_name`. 
 
 **Default**
 The `default` parameter is the default value you expect for it. Say if you need a welcome message, you want a default value to be assigned but also want to be customizable within settings.

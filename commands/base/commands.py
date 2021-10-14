@@ -135,6 +135,9 @@ def refresh(self):
     self.commands = {'pre':{}}
     self.modules = []
     self.load_functions(toload)
+    
+    for x in self.events:
+        self.events[x] = []
 
     os.chdir(cdir)
 

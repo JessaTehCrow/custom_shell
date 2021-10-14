@@ -7,11 +7,14 @@ from utils.utils import *
 
 class function():
     def __init__(self,func:callable,name:str,args:list,desc:str,help:str,module:str):
+        self.times_run = 0
+
         self.func,self.name,self.args,self.desc,self.help,self.module = func,name,args,desc,help,module
         self.give_self = args[0][0] == "self" if len(args) >0 else False
         if self.give_self: self.args.pop(0)
     
     def run(self,args:list,kwargs:dict={}):
+        self.times_run += 1
         return self.func(*args,**kwargs)
 
 class shell():
@@ -27,7 +30,7 @@ class shell():
         self.running = []
         self.after_load = []
         self.cprint = cpr
-        self.load_functions(['base','custom'])
+        self._load_functions(['base','custom'])
 
     def run(self, command:str, help_if_error:bool=True):
         "Runs a function from module or runs as cmd"
@@ -40,8 +43,8 @@ class shell():
             args = [[],{}]
 
             #Check if args match function args (type & amount)
-            args[0] = self.check_args(targs[0],func)
-            args[1] = self.check_args(targs[1],func)
+            args[0] = self._check_args(targs[0],func)
+            args[1] = self._check_args(targs[1],func)
             if not all([x!=False for x in args]): exit_code = 1
 
             # if function requests the shell class, give it as argument
@@ -72,13 +75,13 @@ class shell():
             exit_code = 1
         
         if exit_code == 1 and help_if_error and temp != None:
-            path = self.get_function_path(command)
+            path = self._get_function_path(command)
             self.run(f'help {path}'.split())
 
         return exit_code
 
     ## utility ##
-    def get_function_path(self,command:list):
+    def _get_function_path(self,command:list):
         if command[0] in self.commands['pre']:
             return command[0]
         
@@ -124,7 +127,7 @@ class shell():
 
             return False
 
-    def do_event(self,event:str):
+    def _do_event(self,event:str):
         "Just do the event lol"
         try:
             for x in self.events[event]: x(self)
@@ -132,7 +135,7 @@ class shell():
             cprint(f"[R]Error handling '{event}' event\n{traceback.format_exc()}")
         self.events[event] = []
 
-    def check_args(self,args,function:function):
+    def _check_args(self,args,function:function):
         "Check if args are same type as function argument"
         new = []
         t_args = function.args
@@ -223,7 +226,7 @@ class shell():
             
             #Load into command storage
             data[f[0]] = function(getattr(imlib,f[0]),*f)
-            self.do_event("on_load")
+            self._do_event("on_load")
         key = pyname
         desc, long_desc = "",""
 
@@ -244,9 +247,9 @@ class shell():
         std.write(cconvert(f"\r[GR]Succesfully imported the [G]{pyname}[GR] module[E]\n"))
         std.flush()
 
-        self.do_event("on_ready")
+        self._do_event("on_ready")
 
-    def load_functions(self,dirs:list):
+    def _load_functions(self,dirs:list):
         "Load functions from directory"
         for x in dirs:
             loc = 'commands/'+x+'/'
@@ -256,7 +259,7 @@ class shell():
             for f in files:
                 pyname = f.split('.')[0]
                 self.load_function(pyname,loc)
-        self.do_event("on_shell_ready")
+        self._do_event("on_shell_ready")
 
     @staticmethod
     def get_functions(directory):
