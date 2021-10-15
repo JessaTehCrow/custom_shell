@@ -162,8 +162,9 @@ class shell():
                             return False
                         new.append(output)
                     return new
-
-                is_valid,output = types[argtype](x) # Get string type (EG: if string matches int,float,bool etc.)
+                is_valid,output = True, x
+                if argtype:
+                    is_valid,output = types[argtype](x) # Get string type (EG: if string matches int,float,bool etc.)
                 
                 if not is_valid: 
                     cprint(f"[R]Argument '{t_args[i][0]}' should be of type {argtype}.")
