@@ -22,7 +22,7 @@ class color:
     LBG = '\x1b[6;46m' #light blue bg
     WBG = '\x1b[6;47m' #White bg
     GBG = '\x1b[1;7;30m' #gray bg
-    ERR = f'\x1b[6;39;41m' #error
+    ERR = '\x1b[6;39;41m' #error
 
 colors = {}
 

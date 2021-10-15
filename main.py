@@ -7,11 +7,12 @@ default = "[G]$dir$ [E]> [GR] "
 
 data = shell.loader.load(default, _name="shell ")
 
-while 1:
-    try:
-        cmd = input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))))
-        if len(cmd)==0: continue
-        shell.run(cmd.split())
+if __name__ == "__main__":
+    while 1:
+        try:
+            cmd = input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))))
+            if len(cmd)==0: continue
+            shell.run(cmd.split())
 
-    except KeyboardInterrupt:
-        print()
+        except KeyboardInterrupt:
+            print()

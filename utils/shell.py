@@ -139,7 +139,7 @@ class shell():
         "Check if args are same type as function argument"
         new = []
         t_args = function.args
-        if len(t_args) < len(args):
+        if len(t_args) < len(args) and t_args[0][0][0] != "*":
             cprint(f"[R]Too many arguments for command")
             return False
 
