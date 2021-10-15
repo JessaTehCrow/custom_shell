@@ -128,13 +128,14 @@ def refresh(self):
     cdir = os.getcwd()
     os.chdir(sys.path[0])
 
-    for x in self.modules: sys.modules.pop(x)
+    for x in self.modules:  
+        sys.modules.pop(x)
 
     toload = ['base','custom']
 
     self.commands = {'pre':{}}
     self.modules = []
-    self.load_functions(toload)
+    self._load_functions(toload)
     
     for x in self.events:
         self.events[x] = []

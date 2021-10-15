@@ -42,4 +42,3 @@ def test(variable:int=3):
     __help__ = "[L]A more detailed description for this function!\n[B]Variable[G] Any non-decimal number\nPrints the value of [B]X [G]squared"
 
     print( _local_function( variable ) )
-
