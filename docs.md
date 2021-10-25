@@ -7,6 +7,8 @@ Contents:
 - [Shell object](#shell-object)
 - [Custom modules](#custom-modules)
 - [Build-in modules](#build-in-modules)
+- [Cprint](#cprint)
+- [Settings](#settings)
 - Others
 
 ## Installing
@@ -224,4 +226,117 @@ ___
 The only difference is that `loader.save()` will over-write the current value.
 
 ___
+## Cprint
+
+The cprint is the build-in coloring method you can access through the shell object (`shell.cprint`), or through importing it from `utils.cprint`.
+
+- Coloring
+- Cprint
+- Cconvert
+- NEprint
+- C tabulate
+- Colors
+
+### Coloring
+
+This module has an easy way of coloring text, it's by using `[color code here]` within the string.
+For example `"[R]This is red. [B]This is blue. [Y]This is yellow`. 
+
+All the colors can be found [below](#colors)
+
+### Cprint
+
+This is the main way of printing colored text. It works the same as normal `print` except it colors the color-coded string. 
+This will also automatically stop the color at the end of the string (This may break if an Error occured within your program).
+
+### Cconvert
+
+This is the way to store a colored string as a variable, and can be used in other functions like `input` or even normal `print`
+
+`colored_text = cprint.cconvert("[R]Colored [Y]String")`
+
+
+### NEprint
+
+This is the same as [cprint](#cprint) except it does not clear the color at the end.
+
+### C tabulate
+
+This is a slightly more complex function, but still easy to use (i think...)
+
+`c_tabulate` has 8 arguments `input_array`, `headers`, `space`, `colors`, `title_colors`, `sort` and `sort_key`.
+
+`input_array` and `headers` are neccecary and the rest are optional.
+
+**C_Tabulate example**
+```
+     Title1             Title2         Title3
+----------------     ------------     ---------
+ Ctabulate            Test             Example
+                      < Was none
+ Only one value
+ ```
+Example above can be replicated with this code
+ ```py
+def main(self):
+    cprint = self.cprint
+
+    headers = ["Title1", "Title2", "Title3"]
+
+    inp = [
+        ["Ctabulate","Test","Example"],
+        [None,"< Was none"],
+        ["Only one value"]
+    ]
+
+    cprint.c_tabulate(inp,headers)
+ ```
+
+**input_array**
+
+`input_array` is a 2d matrix (or simply put, an array of arrays).
+This matrix can be as long as you want, however the arrays within that matrix need to be as long as the headers, but can be shorter.
+Nonetypes will be percieved as an empty value, and will also be treated that way. (See ctabulate example above)
+
+
+
+**headers**
+
+The headers are the headers shown on the list
+
+### Colors
+
+`[E]` = Clear color
+
+`[BL]` = Black
+
+`[G]` = Gray
+
+`[GR]` = Green
+
+`[B]` = Blue
+
+`[L]` = Light blue
+
+`[P]` = Purple
+
+`[R]` = Red
+
+`[Y]` = Yellow
+
+`[BO]` = Bold
+
+`[U]` = Underline
+
+To change a color into a background color, all you need to do is add `BG` to it.
+For example `[RBG]` is red background.
+
+## Settings
+
+There's only one settings that this shell comes with by default, that's the `shell` setting. This is what prompt you get when using the shell. aka: `C:/path/to/where/you/are Name> ` or `user$ `.
+This uses the cprint coloring method and has one variable you can use within it.
+You can use `%dir%` to put your current working directory in that place.
+
+For example, if you have the shell setting like this: `(%dir%) name> `, it's visible output would be something along the lines of: `(C:/current/working/directory) name> `.
+
 ## Other things that will probably eventually come to mind, hopefully
