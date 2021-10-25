@@ -98,7 +98,10 @@ def c_tabulate(input_arr:list,headers:list,focus="left",space:int=5,cols:list=No
     for arr in input_arr+[headers]:
         for i,x in enumerate(arr):
             #remove all colors ([R],[Y],etc)
-            x =  re.sub(to_regex(),'',x)
+            if x != None:
+                x =  re.sub(to_regex(),'',x)
+            else:
+                x = ""
             #get longest length of string splited by newline
             length = len(sorted(x.split("\n"),key=lambda x:len(x))[-1])+2
             #save length
@@ -108,10 +111,11 @@ def c_tabulate(input_arr:list,headers:list,focus="left",space:int=5,cols:list=No
         out = []
         for line,arr in enumerate(array):
             temp = []
-            nlines = sorted([x.count('\n') for x in arr])[-1]
+            nlines = sorted([(x.count('\n') if x != None else 0) for x in arr])[-1]
 
             for i,x in enumerate(arr):
                 #get offset
+                x = x if x != None else ""
                 off = [len(''.join([r.group() for r in re.finditer(to_regex(),string)])) for string in x.split('\n')]
                 temp2 = []
 
