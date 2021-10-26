@@ -6,9 +6,11 @@ It has custom modules, easy usage and easily customizable.
 ## Why
 
 **Why you would want to use it**
+
 It looks better and has better customizability. That's really all i can say 
 
 **Why i made it**
+
 I made this because i personally really didn't like the default windows command prompt.
 So i decided i'd make my own shell that'll be more customizable AND look better.
 This is my third time making a shell, and with that also the best version. 

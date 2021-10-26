@@ -45,7 +45,9 @@ class shell():
             #Check if args match function args (type & amount)
             args[0] = self._check_args(targs[0],func)
             args[1] = self._check_args(targs[1],func)
-            if not all([x!=False for x in args]): exit_code = 1
+            if not all(x != False for x in args[0]) or not all(x != False for x in args[1]):
+                cprint(f"[R]Invalid argument type given")
+                exit_code = 1
 
             # if function requests the shell class, give it as argument
             if func.give_self and exit_code == 0: 
@@ -142,6 +144,19 @@ class shell():
         if len(t_args) < len(args) and t_args[0][0][0] != "*":
             cprint(f"[R]Too many arguments for command")
             return False
+
+        if len(t_args) > 0 and (t_args[0][0]).startswith('*') and type(args) == list:
+            if t_args[0][1] == None:
+                return args
+
+            for x in args:
+                valid, out = types[t_args[0][1]](x)
+                if not valid:
+                    new.append(False)
+                else:
+                    new.append(out)
+
+            return new
 
         if type(args) == list:
             #Check all args give to see if they fit the given command variables

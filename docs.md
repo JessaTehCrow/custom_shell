@@ -339,4 +339,8 @@ You can use `%dir%` to put your current working directory in that place.
 
 For example, if you have the shell setting like this: `(%dir%) name> `, it's visible output would be something along the lines of: `(C:/current/working/directory) name> `.
 
+<<<<<<< HEAD
 ## Other things that will probably eventually come to mind, hopefully
+=======
+## Other things that will probably eventually come to mind, hopefully
+>>>>>>> 4d6fdfcf341f9d55f87b5828c8c8832d1d487eba
