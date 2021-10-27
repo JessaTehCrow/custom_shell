@@ -3,13 +3,15 @@
 This custom shell is a python alternative for your standard windows cmd.
 It has custom modules, easy usage and easily customizable.
 
+Join the **[discord](https://discord.gg/ZWFefjGf2g)** server to get help, download modules or upload your own!
+
 ## Why
 
-**Why you would want to use it**
+### Why you would want to use it
 
 It looks better and has better customizability. That's really all i can say 
 
-**Why i made it**
+### Why i made it
 
 I made this because i personally really didn't like the default windows command prompt.
 So i decided i'd make my own shell that'll be more customizable AND look better.
