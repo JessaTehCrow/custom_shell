@@ -42,3 +42,12 @@ def test(variable:int=3):
     __help__ = "[L]A more detailed description for this function!\n[B]Variable[G] Any non-decimal number\nPrints the value of [B]X [G]squared"
 
     print( _local_function( variable ) )
+
+# Function that gets the shell object
+def test2(self):
+    "Getting the shell object"
+
+    __help__ = "[G]No arguments for this function"
+
+    # Use "self.cprint" to use the cprint module without needing to import it
+    self.cprint.cprint("[B]Currently running command:[P]",self.running[-1].name)
