@@ -132,7 +132,10 @@ class shell():
     def _do_event(self,event:str):
         "Just do the event lol"
         try:
-            for x in self.events[event]: x(self)
+            for x in self.events[event]: 
+                self.running.append(x)
+                x(self)
+                self.running.pop()
         except:
             cprint(f"[R]Error handling '{event}' event\n{traceback.format_exc()}")
         self.events[event] = []

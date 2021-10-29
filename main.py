@@ -5,7 +5,7 @@ shell = shell()
 
 default = "[G]$dir$ [E]> [GR] "
 
-data = shell.loader.load(default, _name="shell ")
+data = shell.loader.load(default, _name="shell")
 
 if __name__ == "__main__":
     while 1:

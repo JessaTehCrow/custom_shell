@@ -9,6 +9,3 @@ utils/__pycache__
 # settings
 settings/*
 !settings/pre_import.json
-
-# executables
-shelly.exe

@@ -28,7 +28,10 @@ class _loader():
             return rewrite()
 
     def _get_module(self):
-        return sys._getframe().f_back.f_code.co_filename.split('\\')[-1].split('.')[0]
+        running = self._shell.running[-1]
+        if hasattr(running,'module'):
+            return running.module
+        return running.__module__.split('.')[-1]
 
     def load(self,default,sub:str='main',_name:str=None):
         "Returns json data for module, saves default if it doesn't exist"
