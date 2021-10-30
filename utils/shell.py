@@ -144,11 +144,11 @@ class shell():
         "Check if args are same type as function argument"
         new = []
         t_args = function.args
-        if len(t_args) < len(args) and t_args[0][0][0] != "*":
+        if len(t_args) < len(args) and not any([x[0][0] == '*' for x in t_args]):
             cprint(f"[R]Too many arguments for command")
             return False
 
-        if len(t_args) > 0 and (t_args[0][0]).startswith('*') and type(args) == list:
+        if len(t_args) > 0 and (any([x[0][0] == '*' for x in t_args]) and type(args) == list):
             if t_args[0][1] == None:
                 return args
 
