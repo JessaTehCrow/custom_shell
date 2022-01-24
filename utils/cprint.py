@@ -6,7 +6,7 @@ class color:
     G = '\033[90m' #gray
     L = '\033[96m' #light blue
     P = '\033[95m' #purple
-    B = '\033[94m' #bold
+    B = '\033[94m' #blue
     GR = '\033[92m' #green
     Y = '\033[93m' #yellow
     R = '\033[91m' #red
@@ -31,24 +31,36 @@ for x in color.__dict__:
     if not x.endswith("_"):
         exec(f"colors['[{x}]'] = color.{x}")
 
+def decolor(string:str):
+    for color in colors:
+        string = string.replace(color, "")
+    return string
+
+def escape(string:str):
+    for color in colors:
+        string = string.replace(f"\{color}", color)
+        string = string.replace(color, f"\{color}")
+
+    return string
+
+def cconvert(sentence:str):
+    for x in colors:
+        sentence = sentence.replace(x,colors[x])
+        sentence = sentence.replace(f"\\{colors[x]}", x)
+        sentence = sentence.replace(f"\\{x}", f"\\\\{colors[x]}")
+    return sentence
+
 def to_regex():
     return f"\[({'|'.join([x for x in color.__dict__ if not x.endswith('_')])})\]"
 
 def cprint(*sentence):
-    sentence = ' '.join(sentence)
-    for x in colors:
-        sentence = sentence.replace(x,colors[x])
+    sentence = cconvert(' '.join(sentence))
+
     print(sentence + colors["[E]"])
 
-def NEprint(sentence):
-    for x in colors:
-        sentence = sentence.replace(x,colors[x])
+def NEprint(*sentence):
+    sentence = cconvert(' '.join(sentence))
     print(sentence)
-
-def cconvert(sentence):
-    for x in colors:
-        sentence = sentence.replace(x,colors[x])
-    return sentence
 
 def c_tabulate(input_arr:list,headers:list,focus="left",space:int=5,cols:list=None,title_cols:list=None,sort:str=None,sort_key=None):
     if not input_arr: input_arr = [['N/A']*len(headers)]

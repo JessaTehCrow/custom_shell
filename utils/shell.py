@@ -1,15 +1,15 @@
 from sys import stdout as std
 import traceback, importlib
 import os,ast,sys
-import utils.cprint as cpr
-from utils.cprint import *
+import cprint as cpr
+from cprint import *
 from utils.utils import *
 
 class function():
-    def __init__(self,func:callable,name:str,args:list,desc:str,help:str,module:str):
+    def __init__(self,func:callable,name:str,args:list,desc:str,help:str,module:str,ignore_args:bool):
         self.times_run = 0
 
-        self.func,self.name,self.args,self.desc,self.help,self.module = func,name,args,desc,help,module
+        self.func,self.name,self.args,self.desc,self.help,self.module,self.ignore_args = func,name,args,desc,help,module,ignore_args
         self.give_self = args[0][0] == "self" if len(args) >0 else False
         if self.give_self: self.args.pop(0)
     
@@ -21,6 +21,7 @@ class shell():
     def __init__(self):
         self.root_path = sys.path[0].replace("\\","/")
         self.commands = {"pre":{}}
+        self.raw_import = {}
         self.modules = []
         self.events = {
             "on_load":[],
@@ -45,7 +46,7 @@ class shell():
             #Check if args match function args (type & amount)
             args[0] = self._check_args(targs[0],func)
             args[1] = self._check_args(targs[1],func)
-            if not all(x != False for x in args[0]) or not all(x != False for x in args[1]):
+            if any((x == False and type(x) != int) for x in args[0]) or any((x == False and type(x) != int) for x in args[1]):
                 cprint(f"[R]Invalid argument type given")
                 exit_code = 1
 
@@ -96,31 +97,44 @@ class shell():
 
             else:
                 return command[0]
+    def load_kwargs(self,args:list):
+        kwargs = {}
+        #loop through all args that start with '-'
+        for i,x in [[i+1,x] for i,x in enumerate(args) if x.startswith('-')]:
+            #If '-' argument doesn't have a value, ignore it
+            if len(args)<=i: continue
 
-    def get_function(self,command:str):
+            kwargs[x[1:]] = args[i]
+            args.pop(i)
+        return kwargs
+
+    def get_args(self,args:list,func):
+        ignore = func.ignore_args
+        kwargs = {}
+        if ignore:
+            return [args,{}]
+
+        kwargs = self.load_kwargs(args)
+        return ([x for x in args if any([ignore,not x.startswith('-')])],kwargs)
+
+    def get_function(self,command:list):
         "get function and args from command"
-        def get_args(args):
-            kwargs = {}
-            #loop through all args that start with '-' then invert the list to avoid incorrect index positioning
-            for i,x in [[i+1,x] for i,x in enumerate(args) if x.startswith('-')][::-1]:
-                #If '-' argument doesn't have a value, ignore it
-                if len(args)<=i: continue
-
-                kwargs[x[1:]] = args[i]
-                args.pop(i)
-            return ([x for x in args if not x.startswith('-')],kwargs)
 
         # If command pre-loaded give that 
-        if command[0] in self.commands['pre']: return [self.commands['pre'][command[0]], get_args(command[1:])]
+        if command[0] in self.commands['pre']: 
+            func = self.commands['pre'][command[0]]
+            return [func, self.get_args(command[1:],func)]
 
         if command[0] in self.commands:
             if len(command) > 1 and command[1] in self.commands[command[0]]:  
                 # Get command and args
-                return [self.commands[command[0]][command[1]], get_args(command[2:])]
+                func = self.commands[command[0]][command[1]]
+                return [func, self.get_args(command[2:],func)]
 
             elif 'main' in self.commands[command[0]]: 
                 # Get a module's main command if exists
-                return [self.commands[command[0]]['main'], get_args(command[1:])]
+                func = self.commands[command[0]]['main']
+                return [func, self.get_args(command[1:],func)]
 
             elif not len(command) > 1: 
                 cprint("[R]Not enough arguments")
@@ -146,7 +160,7 @@ class shell():
         t_args = function.args
         if len(t_args) < len(args) and not any([x[0][0] == '*' for x in t_args]):
             cprint(f"[R]Too many arguments for command")
-            return False
+            return [False]
 
         if len(t_args) > 0 and (any([x[0][0] == '*' for x in t_args]) and type(args) == list):
             if t_args[0][1] == None:
@@ -177,7 +191,7 @@ class shell():
                         is_valid,output = types[argtype](arg)
                         if not is_valid:
                             cprint(f"[R]Argument '{t_args[i][0]}' should be of type {argtype}.")
-                            return False
+                            return [False]
                         new.append(output)
                     return new
                 is_valid,output = True, x
@@ -186,7 +200,7 @@ class shell():
                 
                 if not is_valid: 
                     cprint(f"[R]Argument '{t_args[i][0]}' should be of type {argtype}.")
-                    return False
+                    return [False]
                 new.append(output)
 
         #Check kwargs
@@ -226,6 +240,7 @@ class shell():
         #Import module
         try: 
             imlib = importlib.import_module(pyfile)
+            self.raw_import[pyname] = imlib
         except:
             std.write(cconvert(f"\r[R]Error importing {pyname}:\n\n{traceback.format_exc()}"))
             std.flush()
@@ -296,17 +311,25 @@ class shell():
             for line in func_body:
                 if isinstance(line,ast.Assign) and isinstance(line.value,ast.Constant):
                     if line.targets[0].id == "__help__": return line.value.value
+        def get_ignore(func_body): # Get function __help__ value
+            for line in func_body:
+                if isinstance(line,ast.Assign) and isinstance(line.value,ast.Constant):
+                    if line.targets[0].id == "__ignore_args__": return line.value.value
         def get_args(function): #Get function arguments with type indicator
             normal,varg,kwarg = [[arg.arg,(arg.annotation.id if arg.annotation else None),get_default(function.args.defaults,arg)] for arg in function.args.args],function.args.vararg,function.args.kwarg
-            if varg:normal.append(["*"+varg.arg,(varg.annotation.id if varg.annotation else None),None])
-            if kwarg: normal.append(['**'+kwarg.arg,(kwarg.annotation.id if kwarg.annotation else None),None])
+            if varg:normal.append(["*"+varg.arg,(varg.annotation.id if varg.annotation else None),"None"])
+            if kwarg: normal.append(['**'+kwarg.arg,(kwarg.annotation.id if kwarg.annotation else None),"None"])
             return normal
+
         def get_default(defaults,arg): #Get default value from args
             for default in defaults:
-                if default.col_offset == arg.end_col_offset+1: return default.value
+                if default.col_offset == arg.end_col_offset+1: 
+                    return default.value
+                else:
+                    return "None"
 
         parsed = parse_ast(directory)
         funcs = top_level_functions(parsed.body)
 
         #Make and return list of it all
-        return [[f.name,get_args(f),get_desc(f.body),get_help(f.body),pyname] for f in funcs if not f.name.startswith("_")]
+        return [[f.name,get_args(f),get_desc(f.body),get_help(f.body),pyname,get_ignore or False] for f in funcs if not f.name.startswith("_")]

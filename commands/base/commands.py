@@ -80,7 +80,7 @@ def help(self,arg1:str=None,arg2:str=None):
         for i,arg in enumerate(function.args):
             temp = ""
             for it,det in enumerate(arg):
-                if det == None: break
+                if det == None or det=="None": break
                 det = det if it<len(arg)-1 else repr(det)
                 temp += f"{inbt[it]}{cols[it]}{det}"
             out.append(['','\n'][(i)%3==0 and i !=0 and len(function.args)>i] + temp)
@@ -142,6 +142,37 @@ def refresh(self):
 
     os.chdir(cdir)
 
+
+def _reload_suggestion(self, args:list):
+    search = ' '.join(args)
+    modules = [x for x in list(self.commands)[1:] if x.startswith(search)]
+
+    space = '' if args else ' '
+    if search in modules:
+        return
+
+    elif modules:
+        return True, space + modules[0][len(search):]
+
+def _reload_highlight(self, args:list):
+    if not args:
+        return
+
+    search = ' '.join(args[:1])
+    modules = [x for x in list(self.commands)[1:] if x.startswith(search)]
+
+    color = '[R][U][BO]'
+    if search in modules:
+        color = '[GR]'
+
+    elif modules:
+        color = '[Y]'
+
+    args[0] = color+args[0]+'[E]'
+    args[1:] = [f'[R][U][BO]{x}[E]' for x in args[1:]]
+    
+    return args
+
 def reload(self,module:str):
     "Reload module"
     cdir = os.getcwd()
@@ -162,14 +193,51 @@ def reload(self,module:str):
 
     os.chdir(cdir)
 
-def load(self,module:str):
-    "Import a module"
-    dirs = ['base','commands']
-    m = sys.path[0]
-    print(m)
 
-def cd(path:str):
+def _cd_suggestion(self, args:list):
+    search = os.getcwd().replace('\\','/') + '/' + ' '.join(args)
+    directory = '/'.join(search.split('/')[:-1])+"/"
+    search = search.split('/')[-1] 
+
+    if not os.path.isdir(directory):
+        return 
+
+    raw_paths = os.listdir(directory) + ['..', '.']
+    dirs = [x for x in raw_paths if os.path.isdir(directory+x) and x.startswith(search)]
+
+    space = '' if args else ' '
+    if search in dirs:
+        return 
+
+    elif dirs:
+        return True, space + dirs[0][len(search):]
+
+def _cd_highlight(self, args:list):
+    search = os.getcwd().replace('\\','/') + '/' + ' '.join(args)
+    if ':' in args:
+        search = ' '.join(args)
+        
+    directory = '/'.join(search.split('/')[:-1])+"/"
+    search = search.split('/')[-1] 
+
+    if not os.path.isdir(directory):
+        return 
+
+    raw_paths = os.listdir(directory) + ['..', '.']
+    dirs = [x for x in raw_paths if os.path.isdir(directory+x) and x.startswith(search)]
+    
+    color = '[R][U][BO]'
+    if search in dirs or not search:
+        color = '[GR]'
+
+    elif dirs:
+        color = '[Y]'
+
+    return [color]*len(args)
+
+def cd(*path:str):
     "Change current directory"
+    path = ' '.join(path)
     if os.path.isdir(path):
         os.chdir(path)
     else:
@@ -228,6 +296,30 @@ def ls():
         print_names("hidden_files","hidden_directories")
         output(listing['hidden_file'],listing['hidden_directory'])
 
+
+def _hide_suggestion(self, args:list):
+    search = ' '.join(args)
+    files = [x for x in os.listdir() if os.path.isfile(x) and x.startswith(search)]
+
+    space = '' if args else ' '
+    if search in files:
+        return
+    elif files:
+        return True, space+files[0][len(search):]
+
+def _hide_highlight(self, args:list):
+    search = ' '.join(args)
+    files = [x for x in os.listdir() if os.path.isfile(x) and x.startswith(search)]
+    
+    color = '[R][U][BO]'
+    if search in files:
+        color = '[GR]'
+
+    elif files:
+        color = '[Y]'
+
+    return [color]*len(args)
+
 def hide(*path:str, silent:bool=False):
     "Make file or folder hidden"
     __help__ = "[B]path [G]is the path to the file or folder from current directory"
@@ -240,6 +332,13 @@ def hide(*path:str, silent:bool=False):
     os.system(tohide)
     if not silent:
         cprint(f'[GR]Succesfully hidden {" ".join(path)}')
+
+
+def _unhide_suggestion(self, args:list):
+    return _hide_suggestion(self, args)
+
+def _unhide_highlight(self, args:list):
+    return _hide_highlight(self, args)
 
 def unhide(*path:str, silent:bool=False):
     "Unhide a hidden folder or file"

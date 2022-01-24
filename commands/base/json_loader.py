@@ -44,21 +44,23 @@ class _loader():
         
         data = self._json_data[module_name][sub]
         if type(data) != type(default):
-            self.save(default,sub,module_name)
+            self.save(default, sub, module_name)
             return default
         
-        if isinstance(data,dict):
-            data = {**default,**data}
+        if isinstance(data, dict):
+            new_data = {**default,**data}
+
             if not all(x in data.keys() for x in default.keys()):
-                self.save(module_name,data,sub)
+                self.save(new_data, sub, module_name)
+
+            data = new_data
         
-        #return data
         return data
     
-    def save(self,default,sub:str="main",_name:str=None):
+    def save(self, default, sub:str="main", _name:str=None):
         "Save data to disk"
         module = _name or self._get_module()
-        #Check if module in data
+
         if not module in self._json_data:
             self._json_data[module] = {}
 
