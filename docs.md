@@ -6,6 +6,8 @@ Contents:
 - [Installing](#installing)
 - [Shell object](#shell-object)
 - [Custom modules](#custom-modules)
+- [Highlighting](#highlighting)
+- [Suggestions](#suggestions)
 - [Build-in modules](#build-in-modules)
 - [Cprint](#cprint)
 - [Settings](#settings)
@@ -159,7 +161,80 @@ def some_example(number : int):
 ```
 this would be the final version of the function.
 Like stated before, you don't need to check if number is actually an integer, the shell takes care of that.
+___
+## Highlighting
 
+The shell has a custom stdin handler, which allows for per-character highlighting.
+The highlighting by default is done by command arguments.
+
+![](images/highlight.png)
+Here `example` is the module `test` is the sub-command and `432` is an int-argument
+
+The highlighting is done automatically from function arguments.
+```py
+def highlight(arg1:int, arg2:str, arg3:bool):
+    pass
+```
+These arguments will be automatically highlighted in the commandline.
+
+
+### Custom highlighting
+
+You can also make custom highlighting per function.
+This can be done by making another function, with the following pattern for the name: `_[func_name]_highlight()`
+
+This function will always get the shell object, and the current command arguments.
+To get this to work, you need to return a list with [Cprint](#cprint) colors with the same length as the arguments given.
+
+Example:
+```py
+def _get_file_highlight(self, args:list):
+    colors = ['[E]']*len(args) # Clear color the length of arguments
+    search = ' '.join(args)
+    
+    files = [x for x in os.listdir() if os.path.isfile(x)]
+
+    # Check if command arguments is a file in current directory
+    if search in files:
+        colors = ['[GR]']*len(args) # Green color the length of length
+
+    return colors
+
+
+def get_file(*file:str):
+    ...
+```
+___
+## Suggestions
+
+Just like highlighting, the shell also has suggestions.
+They work extremely simmilar to highlighting, yet a little different.
+
+Just like highlighting, it needs another function to work with a simmilar pattern: `_[func_name]_suggestion()`
+
+And instead of returning a list of colors, this function needs to return a single string that will get **appended** to the current command.
+
+![](images/suggestion.png)
+`ex` is the user input, and `ample` is the appended suggestion.
+
+example:
+```py
+def _get_file_suggestion(self, args:list):
+    search = ' '.join(args)
+    
+    files = [x for x in os.listdir() if os.path.isfile(x)]
+    suggestion_files = [x for x in files if x.startswith(search)]
+
+    if search in files:
+        return # Returning nothing will tell the shell to ignore this custom suggestion
+
+    elif suggestion_files:
+        return suggestion_files[0][len(search):]
+        # Return the first file in suggestion_files, and remove what's already written
+
+def get_file(*file):
+    ...
+```
 ___
 ## Build-in modules
 

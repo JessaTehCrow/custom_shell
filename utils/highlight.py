@@ -92,7 +92,6 @@ class Highlight():
             cols[0] = self.colors["command"]
 
         # If command[0] can't be found, check if it's a file in the current directory
-
         elif command[0] in [x for x in os.listdir() if os.path.isfile(x)]:
             cols[0] = self.colors["file_color"]
             return cols

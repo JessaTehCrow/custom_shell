@@ -128,6 +128,6 @@ class perserve_split():
             if isinstance(x, int):
                 i += 1
             else:
-                output[max(0, i*2-offset)] = self.colors[i-offset] + self.split_string[i-offset]
+                output[max(0, i*2-offset)] = self.colors[i-offset] + self.split_string[i-offset] + '[E]'
 
         return ''.join(x if isinstance(x,str) else " "*x for x in output)
