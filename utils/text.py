@@ -56,7 +56,7 @@ class Text():
         raw._raw_split = raw._raw_split[:-(1+is_int)]
         raw.reset() 
 
-        self.text = raw.re_assemble()
+        self.text = raw.re_assemble(False)
         if self.text == " ":
             self.text = ""
 

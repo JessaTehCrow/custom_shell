@@ -47,7 +47,7 @@ def new_input(prompt:str):
             can_tab, suggest = suggestion.get(split.split_string)
 
             if suggest and can_tab:
-                text.text = split.re_assemble().rstrip() + suggest
+                text.text = split.re_assemble(False).rstrip() + suggest
 
         else:
             text.do_action(key)

@@ -83,12 +83,12 @@ class perserve_split():
     def __len__(self):
         return len(self.split_string)
 
-    def reset(self, keep_colors:bool=False):
+    def reset(self, keep_colors:bool=False) -> None:
         self.split_string = [x for x in self._raw_split if not isinstance(x, int)]
         if not keep_colors:
             self.colors = ['']*len(self.split_string)
 
-    def split(self):
+    def split(self) -> list:
         out = []
 
         char_temp = 0
@@ -116,18 +116,19 @@ class perserve_split():
 
         return out
     
-    def re_assemble(self):
+    def re_assemble(self, apply_end:bool=True) -> str:
         output = list(self._raw_split)
         if not self._raw_split:
             return ''
 
         i = 0
         offset = 0 if isinstance(self._raw_split[0], str) else 1
+        end_color = '[E]' if apply_end else ''
 
         for x in self._raw_split:
             if isinstance(x, int):
                 i += 1
             else:
-                output[max(0, i*2-offset)] = self.colors[i-offset] + self.split_string[i-offset] + '[E]'
+                output[max(0, i*2-offset)] = self.colors[i-offset] + self.split_string[i-offset] + end_color
 
         return ''.join(x if isinstance(x,str) else " "*x for x in output)
