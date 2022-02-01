@@ -11,7 +11,7 @@ class Suggestion():
 
 
     def _update_data(self):
-        self.modules = list(self.shell.commands)[1:]
+        self.modules = list(self.shell.commands)
 
 
     def _get_args(self, module:str, function:str, args:list):
