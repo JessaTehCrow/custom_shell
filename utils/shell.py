@@ -1,8 +1,9 @@
 from sys import stdout as std
 import traceback, importlib
 import os,ast,sys
-import cprint as cpr
-from cprint import *
+import utils.cprint as cpr
+
+from utils.cprint import *
 from utils.utils import *
 
 class function():
@@ -20,7 +21,7 @@ class function():
 class shell():
     def __init__(self):
         self.root_path = sys.path[0].replace("\\","/")
-        self.commands = {"pre":{}}
+        self.commands = {}
         self.raw_import = {}
         self.modules = []
         self.events = {
@@ -85,9 +86,6 @@ class shell():
 
     ## utility ##
     def _get_function_path(self,command:list):
-        if command[0] in self.commands['pre']:
-            return command[0]
-        
         if command[0] in self.commands:
             if len(command) > 1 and command[1] in self.commands[command[0]]:
                 return f"{command[0]} {command[1]}"
@@ -119,11 +117,6 @@ class shell():
 
     def get_function(self,command:list):
         "get function and args from command"
-
-        # If command pre-loaded give that 
-        if command[0] in self.commands['pre']: 
-            func = self.commands['pre'][command[0]]
-            return [func, self.get_args(command[1:],func)]
 
         if command[0] in self.commands:
             if len(command) > 1 and command[1] in self.commands[command[0]]:  
@@ -229,8 +222,6 @@ class shell():
 
     def load_function(self,pyname:str,loc:str):
         "Load function into shell"
-        # Get json to see which functions need to be pre-loaded (so you don't have to use `module function`)
-        pre = get_json("pre_import.json") # type: ignore
         std.write(cconvert(f"\r[Y]Importing {pyname}...[E]"))
         std.flush()
 
@@ -269,11 +260,8 @@ class shell():
         if hasattr(imlib,"__long_desc__"):
             long_desc = getattr(imlib,"__long_desc__")
 
-        #Check if module needs to be pre-loaded
-        if pyname in pre: key = "pre"
-        else: 
-            data["description"] = desc
-            data['long_description'] = long_desc
+        data["description"] = desc
+        data['long_description'] = long_desc
 
         #Load data into dict
         self.commands[key] = data

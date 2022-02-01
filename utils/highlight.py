@@ -22,7 +22,6 @@ class Highlight():
     def __init__(self, shell):
         self.shell = shell
         self.modules = []
-        self.commands = []
         self.colors = shell.loader.load(colors, "colors", "shell")
     
     def _get_functions(self, module:str):
@@ -31,13 +30,12 @@ class Highlight():
 
     def _update_data(self):
         self.modules = list(self.shell.commands)[1:]
-        self.commands = self.modules + list(self.shell.commands['pre'])
 
 
     def _get_args(self, module:str, function:str, args:list):
         cols = [None]*len(args)
 
-        file = "commands" if module == 'pre' else module
+        file = module
         if not module in self.shell.commands or not function in self.shell.commands[module]:
             return
 
@@ -88,11 +86,11 @@ class Highlight():
         func = None
 
         # main command
-        if command[0] in self.commands:
+        if command[0] in self.modules:
             cols[0] = self.colors["command"]
 
         # If command[0] can't be found, check if it's a file in the current directory
-        elif command[0] in [x for x in os.listdir() if os.path.isfile(x)]:
+        if command[0] in [x for x in os.listdir() if os.path.isfile(x)]:
             cols[0] = self.colors["file_color"]
             return cols
 
@@ -102,13 +100,9 @@ class Highlight():
             cols[1] = self.colors["sub_command"]
         
         # get args
-        args_offset = 1
-        if not command_copy[0] in self.modules:
-            func = str(module)
-            module = "pre"
-
-        elif len(command) > 1 and (module in self.modules) and ('main' in self._get_functions(module)) and (func not in self._get_functions(module)):
+        if len(command) > 1 and (module in self.modules) and ('main' in self._get_functions(module)) and (func not in self._get_functions(module)):
             func = "main"
+            args_offset = 1 
 
         else:
             args_offset = 2

@@ -5,7 +5,6 @@ class Suggestion():
     def __init__(self, shell):
         self.shell = shell
         self.modules = []
-        self.commands = []
     
     def _get_functions(self, module:str):
         return {k:v for k,v in self.shell.commands[module].items() if isinstance(v, function)}
@@ -13,11 +12,10 @@ class Suggestion():
 
     def _update_data(self):
         self.modules = list(self.shell.commands)[1:]
-        self.commands = self.modules + list(self.shell.commands['pre'])
 
 
     def _get_args(self, module:str, function:str, args:list):
-        filename = 'commands' if module == 'pre' else module
+        filename =  module
 
         if hasattr(self.shell.raw_import[filename], f"_{function}_suggestion"):
             custom_sugg = getattr(self.shell.raw_import[filename], f"_{function}_suggestion")(self.shell, args)
@@ -47,8 +45,8 @@ class Suggestion():
     
     def _get_suggestion(self, command:list):
         cmd = command[0]
-        if len(command) == 1 and not cmd in self.commands:
-            commands = [x for x in self.commands if x.startswith(cmd)]
+        if len(command) == 1 and not cmd in self.modules:
+            commands = [x for x in self.modules if x.startswith(cmd)]
             file = [x for x in os.listdir() if os.path.isfile(x) and x.startswith(cmd)]
             
             if commands:
@@ -65,9 +63,6 @@ class Suggestion():
             
             elif cmd in self.modules and sub in self._get_functions(cmd):
                 return self._get_args(cmd, sub, command[2:])
-
-            elif cmd in self.commands:
-                return self._get_args('pre', cmd, command[1:])
 
     def get(self, command:list):
         if not command:
