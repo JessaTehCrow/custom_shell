@@ -1,16 +1,17 @@
-from sys import stdout as std
-import traceback, importlib
-import os,ast,sys
+import traceback, inspect
+import os, sys
+
 import utils.cprint as cpr
+import types as Types
 
 from utils.cprint import *
 from utils.utils import *
 
 class function():
-    def __init__(self,func:callable,name:str,args:list,desc:str,help:str,module:str,ignore_args:bool):
+    def __init__(self,func:callable,name:str,args:list,desc:str,help:str,module:str):
         self.times_run = 0
 
-        self.func,self.name,self.args,self.desc,self.help,self.module,self.ignore_args = func,name,args,desc,help,module,ignore_args
+        self.func,self.name,self.args,self.desc,self.help,self.module = func,name,args,desc,help,module
         self.give_self = args[0][0] == "self" if len(args) >0 else False
         if self.give_self: self.args.pop(0)
     
@@ -18,7 +19,7 @@ class function():
         self.times_run += 1
         return self.func(*args,**kwargs)
 
-class shell():
+class Shell():
     def __init__(self):
         self.root_path = sys.path[0].replace("\\","/")
         self.commands = {}
@@ -32,7 +33,6 @@ class shell():
         self.running = []
         self.after_load = []
         self.cprint = cpr
-        self._load_functions(['base','custom'])
 
     def run(self, command:str, help_if_error:bool=True):
         "Runs a function from module or runs as cmd"
@@ -84,6 +84,7 @@ class shell():
 
         return exit_code
 
+
     ## utility ##
     def _get_function_path(self,command:list):
         if command[0] in self.commands:
@@ -95,6 +96,8 @@ class shell():
 
             else:
                 return command[0]
+
+
     def load_kwargs(self,args:list):
         kwargs = {}
         #loop through all args that start with '-'
@@ -106,14 +109,13 @@ class shell():
             args.pop(i)
         return kwargs
 
+
     def get_args(self,args:list,func):
-        ignore = func.ignore_args
         kwargs = {}
-        if ignore:
-            return [args,{}]
 
         kwargs = self.load_kwargs(args)
-        return ([x for x in args if any([ignore,not x.startswith('-')])],kwargs)
+        return ([x for x in args if not x.startswith('-')],kwargs)
+
 
     def get_function(self,command:list):
         "get function and args from command"
@@ -136,6 +138,7 @@ class shell():
 
             return False
 
+
     def _do_event(self,event:str):
         "Just do the event lol"
         try:
@@ -146,6 +149,7 @@ class shell():
         except:
             cprint(f"[R]Error handling '{event}' event\n{traceback.format_exc()}")
         self.events[event] = []
+
 
     def _check_args(self,args,function:function):
         "Check if args are same type as function argument"
@@ -172,13 +176,16 @@ class shell():
             #Check all args give to see if they fit the given command variables
             # Eg: `def func(var1:int)` with command `func 389` it checks if '389' is a valid integer
             for i,x in enumerate(args):
+
                 # Get default arg value
                 argtype = t_args[i][1]
                 if t_args[i][0].startswith("*"):
                     #Check if there's a type defined for this arg
-                    if not argtype: 
+
+                    if argtype == '_empty': 
                         for arg in args[i:]: new.append(arg)
                         continue
+
                     # Check if all given args are of defined type
                     for arg in args[i:]:
                         is_valid,output = types[argtype](arg)
@@ -186,9 +193,11 @@ class shell():
                             cprint(f"[R]Argument '{t_args[i][0]}' should be of type {argtype}.")
                             return [False]
                         new.append(output)
+
                     return new
+
                 is_valid,output = True, x
-                if argtype:
+                if argtype != '_empty':
                     is_valid,output = types[argtype](x) # Get string type (EG: if string matches int,float,bool etc.)
                 
                 if not is_valid: 
@@ -201,16 +210,20 @@ class shell():
             new = {}
             # Loop through all kwargs
             for i,(k,v) in enumerate(args.items()):
+
                 # Get default arg from function args
                 in_arg = any([k in x for x in t_args])
                 if not in_arg and not any(['**' in x[0] for x in t_args]):
                     cprint(f"[R]Unknown kwarg given: {k}")
                     return False
+                    
                 #no clue what i did here, gl future me
-                argtype = [x[1] for x in t_args if x[0] == k][0] if in_arg else [x[1] for x in t_args if x[0].startswith("**")][0]
-                if not argtype: 
+                argtype = next(x[1] for x in args if (in_arg and x[0] == k) or x[0].startswith("**"))
+
+                if argtype == '_empty': 
                     new[k] = v
                     continue #If none defined continue
+
                 is_valid,output = types[argtype](v)
 
                 if not is_valid: 
@@ -220,104 +233,53 @@ class shell():
 
         return new
 
-    def load_function(self,pyname:str,loc:str):
-        "Load function into shell"
-        std.write(cconvert(f"\r[Y]Importing {pyname}...[E]"))
-        std.flush()
 
-        file = loc + pyname+'.py'
-        pyfile = loc.replace("/",'.') + pyname
+shell = Shell()
 
-        #Import module
-        try: 
-            imlib = importlib.import_module(pyfile)
-            self.raw_import[pyname] = imlib
-        except:
-            std.write(cconvert(f"\r[R]Error importing {pyname}:\n\n{traceback.format_exc()}"))
-            std.flush()
-            return 1
-        
-        #Get module functions and description
 
-        funcs = shell.get_functions(file)
-        
-        #Load data
-        data = {}
-        for f in funcs: 
-            #Add to event list
-            if f[0] in self.events:
-                self.events[f[0]].append(getattr(imlib,f[0]))
-                continue
-            
-            #Load into command storage
-            data[f[0]] = function(getattr(imlib,f[0]),*f)
-            self._do_event("on_load")
-        key = pyname
-        desc, long_desc = "",""
+def _get_module(stack):
+    frame = stack[1]
+    module = inspect.getmodule(frame[0])
+    filename = module.__file__
 
-        if hasattr(imlib,"__desc__"):
-            desc = getattr(imlib,"__desc__")
-        if hasattr(imlib,"__long_desc__"):
-            long_desc = getattr(imlib,"__long_desc__")
+    return filename.split('\\')[-1][:-3]
 
-        data["description"] = desc
-        data['long_description'] = long_desc
 
-        #Load data into dict
-        self.commands[key] = data
-        self.modules.append(pyfile)
-        std.write(cconvert(f"\r[GR]Succesfully imported the [G]{pyname}[GR] module[E]\n"))
-        std.flush()
+def _to_function(func, module, desc="", help=""):
+    signature = inspect.signature(func)
 
-        self._do_event("on_ready")
+    args = []
+    for k, v in signature.parameters.items():
+        args.append([v.name, v.annotation.__name__, v.default])
 
-    def _load_functions(self,dirs:list):
-        "Load functions from directory"
-        for x in dirs:
-            loc = 'commands/'+x+'/'
-            #Get all .py files in directory
-            files = [x for x in os.listdir(loc) if x.endswith('.py')]
-            
-            for f in files:
-                pyname = f.split('.')[0]
-                self.load_function(pyname,loc)
-        self._do_event("on_shell_ready")
+    return function(func, func.__name__, args, desc, help, module)
 
-    @staticmethod
-    def get_functions(directory):
-        "Get data from function"
-        pyname = directory.split('/')[-1].split('.')[0]
-        def top_level_functions(body):
-            return (f for f in body if isinstance(f, ast.FunctionDef)) # Get all functions
-        def parse_ast(filename): #Load AST for module
-            with open(directory, "rt") as file:
-                return ast.parse(file.read(), filename=filename)
-        def get_desc(func_body): # Get the function description if exists
-            for line in func_body:
-                if isinstance(line,ast.Expr) and isinstance(line.value,ast.Constant): return line.value.value
-        def get_help(func_body): # Get function __help__ value
-            for line in func_body:
-                if isinstance(line,ast.Assign) and isinstance(line.value,ast.Constant):
-                    if line.targets[0].id == "__help__": return line.value.value
-        def get_ignore(func_body): # Get function __help__ value
-            for line in func_body:
-                if isinstance(line,ast.Assign) and isinstance(line.value,ast.Constant):
-                    if line.targets[0].id == "__ignore_args__": return line.value.value
-        def get_args(function): #Get function arguments with type indicator
-            normal,varg,kwarg = [[arg.arg,(arg.annotation.id if arg.annotation else None),get_default(function.args.defaults,arg)] for arg in function.args.args],function.args.vararg,function.args.kwarg
-            if varg:normal.append(["*"+varg.arg,(varg.annotation.id if varg.annotation else None),"None"])
-            if kwarg: normal.append(['**'+kwarg.arg,(kwarg.annotation.id if kwarg.annotation else None),"None"])
-            return normal
 
-        def get_default(defaults,arg): #Get default value from args
-            for default in defaults:
-                if default.col_offset == arg.end_col_offset+1: 
-                    return default.value
-                else:
-                    return "None"
 
-        parsed = parse_ast(directory)
-        funcs = top_level_functions(parsed.body)
+def command(description='', help=''):
+    module = _get_module(inspect.stack())
 
-        #Make and return list of it all
-        return [[f.name,get_args(f),get_desc(f.body),get_help(f.body),pyname,get_ignore or False] for f in funcs if not f.name.startswith("_")]
+    def inner(func):
+        shell.commands[module][func.__name__] = _to_function(func, module, description, help)
+        return func
+
+    if isinstance(description, Types.FunctionType):
+        func = description
+
+        shell.commands[module][func.__name__] = _to_function(func, module, help)
+        return func
+
+    shell._do_event('on_load')
+    return inner
+
+
+def event(event_name:str):
+    def inner(func):
+        if not event_name in shell.events:
+            cprint(f"[R]Event {event_name} is not a valid event.")
+            return func
+
+        shell.events[event_name].append(func)
+        return func
+
+    return inner

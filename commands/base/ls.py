@@ -1,5 +1,7 @@
 import os
 
+from utils.shell import command
+
 __desc__ = "Directory listing"
 
 if os.name == 'nt':
@@ -44,9 +46,9 @@ class node:
 
         return False
 
+@command("Directory listing")
 def main(self):
     cprint = self.cprint.cprint
-    "Directory listing"
     offset = 50
     raw = os.listdir()
 

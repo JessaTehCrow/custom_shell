@@ -1,10 +1,12 @@
 import time
 from utils.cprint import *
+from utils.shell import command
 __long_desc__ = """[R]Timeit[P]
 
 A module used to time how long a command takes to execute."""
 __desc__ = "Time how long it takes to run a certain command"
 
+@command("Time how long it takes to run a command")
 def main(self,*command:str):
     "Time how long it takes to run a command"
     __help__ = "[B]Command[G] is a shell command"

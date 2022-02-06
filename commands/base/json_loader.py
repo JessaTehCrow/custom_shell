@@ -1,4 +1,5 @@
 import json,os,sys
+from utils.shell import command, event
 __long_desc__ = "Honestly no clue"
 __desc__ = "Easily save data to drive."
 
@@ -70,10 +71,11 @@ class _loader():
         with open(self._path,'w') as f:
             json.dump(self._json_data,f,indent=4)
 
+@event("on_ready")
 def on_ready(self):
     self.loader = _loader(self)
 
+@command("Refresh json data")
 def refresh(self):
-    "Refresh json data with file"
     self.loader._json_data = self.loader.__load__()
     self.cprint.cprint("[GR]Succesfully refreshed data")

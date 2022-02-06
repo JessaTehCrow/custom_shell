@@ -1,12 +1,13 @@
+from utils.shell import command
 __desc__ = "Get help about modules"
 
+@command("Shows help for function", 
+"""[B]module [G]is either a [L]buildin command[G], or a [GR]module[G].
+If [B]function[G] is used, [B]module [G]needs to be a [GR]module[G], and [B]function [G]a [L]Command[G] within the module.""")
 def main(self,module:str=None,function:str=None):
     cp = self.cprint
     cprint = cp.cprint
     c_tabulate = cp.c_tabulate
-
-    "Shows help for function"
-    __help__ = "[B]module [G]is either a [L]buildin command[G], or a [GR]module[G].\nIf [B]function[G] is used, [B]module [G]needs to be a [GR]module[G], and [B]function [G]a [L]Command[G] within the module."
 
     title = "[B]"
     def print_funcs(array, long_desc:str = None):

@@ -1,5 +1,6 @@
 from utils.cprint import *
-from utils.shell import shell as Shell
+from utils import shell
+from utils import loader
 
 from utils.highlight import *
 from utils.suggestion import *
@@ -11,7 +12,9 @@ import msvcrt
 import os
 import sys
 
-shell = Shell()
+loader.load()
+
+shell = shell.shell
 
 suggestion = Suggestion(shell)
 suggestion._update_data()

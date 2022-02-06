@@ -1,5 +1,6 @@
 import os, json, subprocess
 from utils.cprint import *
+from utils.shell import command
 
 __long_desc__ = """[R]Task[P]
 
@@ -7,6 +8,7 @@ Task is a easy way to kill multiple processes within the commandline.
 It's used mainly to kill programs that have multiple processes keeping it alive."""
 __desc__ = "Kill multiple processes with one command"
 
+@command("Kills multiple processes at once")
 def kill(*processes:str):
     "Kills multiple processes"
     __help__ = "[B]processes [G]are process [B]names[G] or [B]PID's[G] devided by [B],"

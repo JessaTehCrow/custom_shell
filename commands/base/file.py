@@ -1,4 +1,5 @@
 import os
+from utils.shell import command
 
 __desc__ = "Make, Hide or Unhide files"
 
@@ -25,6 +26,7 @@ def _hide_highlight(self, args:list):
 
     return [color]*len(args)
 
+@command("Hide file or folder")
 def hide(self, *path:str, silent:bool=False):
     "Make file or folder hidden"
     cprint = self.cprint.cprint
@@ -46,6 +48,7 @@ def _unhide_suggestion(self, args:list):
 def _unhide_highlight(self, args:list):
     return _hide_highlight(self, args)
 
+@command("Unhide file or folder")
 def unhide(self, *path:str, silent:bool=False):
     "Unhide a hidden folder or file"
     cprint = self.cprint.cprint
@@ -60,6 +63,7 @@ def unhide(self, *path:str, silent:bool=False):
     if not silent:
         cprint(f"[GR]Succesfully unhid {' '.join(path)}")
 
+@command("Make a new empty file or folder")
 def new(self, type:str,name:str,hidden:bool=False):
     "Makes a new empty folder or file"
     cprint = self.cprint.cprint

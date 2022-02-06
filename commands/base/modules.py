@@ -1,23 +1,19 @@
 import os, sys
 
+import importlib
+
+from utils import loader
+from utils.shell import command
+
 __desc__ = "Reload or refresh commands"
 
+@command("Reloads all functions and commands")
 def refresh(self):
     "Reloads all functions and commands"
     cdir = os.getcwd()
     os.chdir(sys.path[0])
 
-    for x in self.modules:  
-        sys.modules.pop(x)
-
-    toload = ['base','custom']
-
-    self.modules = []
-    self._load_functions(toload)
-    
-    for x in self.events:
-        self.events[x] = []
-
+    loader.refresh()
     os.chdir(cdir)
 
 def _reload_suggestion(self, args:list):
@@ -50,10 +46,10 @@ def _reload_highlight(self, args:list):
     
     return args
 
-def reload(self,module:str):
+@command("Reload module")
+def reload(self, module:str):
     cprint = self.cprint.cprint
     
-    "Reload module"
     cdir = os.getcwd()
     os.chdir(sys.path[0])
 
@@ -61,13 +57,11 @@ def reload(self,module:str):
         cprint(f"[R]Module not found.")
         os.chdir(cdir)
         return 2
-    
-    pyloc = [x for x in self.modules if x.endswith("."+module)][0]
-    loc = '/'.join(pyloc.split('.')[:-1])+'/'
 
-    sys.modules.pop(pyloc)
-    self.modules.remove(pyloc)
-    self.commands.pop(module)
-    self.load_function(module,loc)
+    desc = self.commands[module]['description']
+    long_desc = self.commands[module]['long_description']
+    self.commands[module] = {"description":desc, "long_description":long_desc}
+
+    importlib.reload(self.raw_import[module])
 
     os.chdir(cdir)

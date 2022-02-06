@@ -1,4 +1,5 @@
 import os
+from utils.shell import command
 
 __desc__ = "Change current directory"
 
@@ -43,6 +44,7 @@ def _main_highlight(self, args:list):
 
     return [color]*len(args)
 
+@command("Changes current directory")
 def main(*path:str):
     "Change current directory"
     path = ' '.join(path)

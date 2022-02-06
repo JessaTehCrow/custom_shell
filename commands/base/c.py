@@ -1,7 +1,8 @@
+from utils.shell import command
 import os
 
 __desc__ = "Clears screen"
 
+@command("Clears screen")
 def main():
-    "Clears screen"
     os.system("cls || clear")  
