@@ -96,6 +96,7 @@ if __name__ == "__main__":
     while 1:
         try:
             text.text = ''
+            text.text_offset = 0
             cmd = new_input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))))
             if len(cmd)==0: continue
             shell.run(cmd.split())
