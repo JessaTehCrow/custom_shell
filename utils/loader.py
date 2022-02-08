@@ -47,7 +47,7 @@ def load():
                 std.flush()
                 continue
 
-            std.write(cconvert(f"\r[GR]Successfully imported the [G]{module}[GR] module\n"))
+            std.write(cconvert(f"\r[GR]Successfully imported the [G]{module}[GR] module[E]\n"))
             std.flush()
 
     shell._do_event("on_shell_ready")
