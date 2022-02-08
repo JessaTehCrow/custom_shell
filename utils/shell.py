@@ -250,7 +250,8 @@ def _to_function(func, module, desc="", help=""):
 
     args = []
     for k, v in signature.parameters.items():
-        args.append([v.name, v.annotation.__name__, v.default])
+        name = str(v).split(':')[0].split('=')[0]
+        args.append([name, v.annotation.__name__, v.default])
 
     return function(func, func.__name__, args, desc, help, module)
 
