@@ -17,6 +17,8 @@ def test(self):
         raw_current_hash = subprocess.check_output('git rev-parse HEAD', stderr=DEVNULL)
         raw_latest_hash = subprocess.check_output('git ls-remote https://github.com/JessaTehCrow/custom_shell.git', stderr=DEVNULL)
 
+        subprocess.check_output('git fetch')
+
         current_hash = raw_current_hash.decode()[:-1]
         latest_hash = raw_latest_hash.decode().split()[0]
 
@@ -36,8 +38,11 @@ def test(self):
     cprint("\n[Y][U]There's a new update available, do you want to update?[E]\n")
     cprint(f"[G]Current hash: [E]{current_hash}")
     cprint(f"[G]New hash: [E]{latest_hash}\n")
-    print('\n',info)
+
     print('\n')
+    print(info)
+    print('\n')
+
     update = input(cconvert(" [GR]y [G]/ [R]n [G]> [P]"))
 
     if update.lower() in "y yes ye".split():
