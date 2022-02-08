@@ -71,6 +71,14 @@ class _loader():
         with open(self._path,'w') as f:
             json.dump(self._json_data,f,indent=4)
 
+@event("on_load")
+def on_load(self):
+    path = self.root_path + '/settings'
+
+    if not os.path.isdir(path):
+        print("Creating settings directory...")
+        os.mkdir(path)
+
 @event("on_ready")
 def on_ready(self):
     self.loader = _loader(self)

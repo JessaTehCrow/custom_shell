@@ -49,17 +49,42 @@ class Text():
         offset = len(self.text) - self.text_offset
         self.text = self.text[:max(0,offset-1)] + self.text[offset:]
 
+    def _get_perserve_index(self):
+        raw = perserve_split(self.text, ' ')
+        if not raw.split_string:
+            return None, None
+
+        offset = len(self.text) - self.text_offset
+
+        raw_offset = int(offset)
+        left = 0
+
+        for index, v in enumerate(raw._raw_split):
+            left = int(raw_offset)
+
+            if isinstance(v, int):
+                raw_offset -= v
+            else:
+                raw_offset -= len(v)
+
+            if raw_offset <= 0:
+                break
+        return index, left
 
     def _ctrl_backspace(self, _):
+        index, left = self._get_perserve_index()
+        if [index,left] == [None, None]:
+            return
+            
         raw = perserve_split(self.text, ' ')
-        is_int = isinstance(raw._raw_split[-1], int) and raw._raw_split[-1] == 1
-        raw._raw_split = raw._raw_split[:-(1+is_int)]
-        raw.reset() 
 
+        if isinstance(raw._raw_split[index], int):
+            raw._raw_split[index] -= left
+        else:
+            raw._raw_split[index] = raw._raw_split[index][left:]
+        
+        raw.reset()
         self.text = raw.re_assemble(False)
-        if self.text == " ":
-            self.text = ""
-
 
     def _arrow(self, key:bytes):
         key = key.decode()
@@ -77,6 +102,9 @@ class Text():
         if key in (left, right):
             self.text_offset += [1,-1][key==right]
             self.text_offset = max(0, min(len(self.text), self.text_offset))
+    
+    def _ctrl_arrow(self, key:bytes):
+        left, up, right, down = b"s \x8d t \x91".split(b" ")
 
 
     def _delete(self):
@@ -89,14 +117,19 @@ class Text():
 
     def _other(self, _):
         arrows = b"KHMP"
+        ctrl_arrow = b"st\x91\x8d"
         other_actions = {
-            b"S" : self._delete
+            b"S" : self._delete,
+            b"s" : self._ctrl_arrow
         }
         
         key = msvcrt.getch()
         if key in arrows:
             self._arrow(key)
-        
+
+        elif key in ctrl_arrow:
+            self._ctrl_arrow(key)
+
         elif key in other_actions:
             other_actions[key]()
 
