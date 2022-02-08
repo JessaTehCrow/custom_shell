@@ -24,7 +24,6 @@ def test(self):
         print(e)
         return 2
 
-    current_hash = 'owo'
     self.version_hash = current_hash
 
     if current_hash == latest_hash:
