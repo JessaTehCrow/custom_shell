@@ -1,7 +1,7 @@
 import json,os,sys
 from utils.shell import command, event
-__long_desc__ = "Honestly no clue"
-__desc__ = "Easily save data to drive."
+__long_desc__ = "Refreshes data from loader.json in settings. Use this only if you changed it manually"
+__desc__ = "Reload json data"
 
 class _loader():
     def __init__(self,shell):
