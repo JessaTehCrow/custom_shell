@@ -14,6 +14,10 @@ def refresh(self):
     os.chdir(sys.path[0])
 
     loader.refresh()
+    
+    self._suggestion._update_data()
+    self._highlight._update_data()
+
     os.chdir(cdir)
 
 def _reload_suggestion(self, args:list):

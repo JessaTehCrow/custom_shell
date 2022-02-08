@@ -8,6 +8,7 @@ from utils.text import Text
 
 from utils.utils import get_cursor, move_cursor, perserve_split
 
+import traceback
 import msvcrt
 import os
 import sys
@@ -25,6 +26,8 @@ highlight._update_data()
 default = "[G]$dir$ [E]> [GR] "
 data = shell.loader.load(default, _name="shell")
 
+shell._suggestion = suggestion
+shell._highlight = highlight
 
 text = Text()
 def new_input(prompt:str):
@@ -93,13 +96,34 @@ def new_input(prompt:str):
         sys.stdout.flush()
 
 if __name__ == "__main__":
+    run = 0
     while 1:
         try:
             text.text = ''
             text.text_offset = 0
+
             cmd = new_input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))))
-            if len(cmd)==0: continue
+
+            if len(cmd)==0:
+                continue
+            
             shell.run(cmd.split())
+            run += 1
 
         except KeyboardInterrupt:
             print()
+
+        except:
+            cprint(f"[R]A severe error has occured:\n\n")
+
+            print(traceback.format_exc())
+
+            if run > 0:
+                cprint(f"\n\n[R]Restarting the shell.")
+                input("Press enter to restart shell")
+                shell.run('modules restart'.split())
+
+            else:
+                cprint(f"\n\n[R]A startup error is occuring, restarting the shell has no effect")
+                input("Press enter to quit.")
+                exit()

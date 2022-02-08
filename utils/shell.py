@@ -257,7 +257,6 @@ def _to_function(func, module, desc="", help=""):
     return function(func, func.__name__, args, desc, help, module)
 
 
-
 def command(description='', help=''):
     module = _get_module(inspect.stack())
 
