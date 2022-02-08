@@ -42,4 +42,3 @@ This is my third time making a shell, and with that also the best version.
 - Fix and add more documentation
 - Fix color bug when typing in a backslash
 - Find more bugs so i can fix them
-- Add highlighting and suggestion when a new command is added using `modules refresh`
