@@ -1,4 +1,3 @@
-from operator import mod
 from utils.shell import command
 import inspect
 

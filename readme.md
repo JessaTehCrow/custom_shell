@@ -35,3 +35,12 @@ It allows you to add new commands, change the look of your shell and a lot more 
 I made this because i personally really didn't like the default windows command prompt.
 So i decided i'd make my own shell that'll be more customizable AND look better.
 This is my third time making a shell, and with that also the best version. 
+
+
+## TODO
+
+- Fix and add more documentation
+- Fix color bug when typing in a backslash
+- Find more bugs so i can fix them
+- Add GIT auto update-detector
+- Add highlighting and suggestion when a new command is added using `modules refresh`

@@ -65,3 +65,10 @@ def reload(self, module:str):
     importlib.reload(self.raw_import[module])
 
     os.chdir(cdir)
+
+
+@command("Restart shell completely")
+def restart(self):
+    path = sys.path[0] + '/main.py'
+
+    os.execl(sys.executable, 'python', path)

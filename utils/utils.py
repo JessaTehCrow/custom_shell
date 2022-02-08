@@ -7,19 +7,19 @@ def is_int(string):
     try:
         return True,int(string)
     except:
-        return False,None
+        return None, None
 
 def is_float(string):
     try:
         return True,float(string)
     except ValueError:
-        return False,None
+        return None, None
 
 def is_bool(string):
     true = ['true','1','y','yes','on']
     false = ['false','0','n','no','off']
     if string.lower() in true+false: return True,string.lower() in true
-    else: return False,None
+    else: return None, None
 
 def is_string(string):
     return True,string

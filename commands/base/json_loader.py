@@ -1,4 +1,4 @@
-import json,os,sys
+import json,os
 from utils.shell import command, event
 __long_desc__ = "Refreshes data from loader.json in settings. Use this only if you changed it manually"
 __desc__ = "Reload json data"

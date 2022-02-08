@@ -47,8 +47,9 @@ class Shell():
             #Check if args match function args (type & amount)
             args[0] = self._check_args(targs[0],func)
             args[1] = self._check_args(targs[1],func)
-            if any((x == False and type(x) != int) for x in args[0]) or any((x == False and type(x) != int) for x in args[1]):
-                cprint(f"[R]Invalid argument type given")
+
+            if any((x == None) for x in args[0]) or any((x == None) for x in args[1]):
+                cprint(f"\n[R]Invalid argument type given\n")
                 exit_code = 1
 
             # if function requests the shell class, give it as argument
@@ -157,7 +158,7 @@ class Shell():
         t_args = function.args
         if len(t_args) < len(args) and not any([x[0][0] == '*' for x in t_args]):
             cprint(f"[R]Too many arguments for command")
-            return [False]
+            return [None]
 
         if len(t_args) > 0 and (any([x[0][0] == '*' for x in t_args]) and type(args) == list):
             if t_args[0][1] == None:
@@ -166,7 +167,7 @@ class Shell():
             for x in args:
                 valid, out = types[t_args[0][1]](x)
                 if not valid:
-                    new.append(False)
+                    new.append(None)
                 else:
                     new.append(out)
 
@@ -191,7 +192,7 @@ class Shell():
                         is_valid,output = types[argtype](arg)
                         if not is_valid:
                             cprint(f"[R]Argument '{t_args[i][0]}' should be of type {argtype}.")
-                            return [False]
+                            return [None]
                         new.append(output)
 
                     return new
@@ -202,7 +203,7 @@ class Shell():
                 
                 if not is_valid: 
                     cprint(f"[R]Argument '{t_args[i][0]}' should be of type {argtype}.")
-                    return [False]
+                    return [None]
                 new.append(output)
 
         #Check kwargs
@@ -215,7 +216,7 @@ class Shell():
                 in_arg = any([k in x for x in t_args])
                 if not in_arg and not any(['**' in x[0] for x in t_args]):
                     cprint(f"[R]Unknown kwarg given: {k}")
-                    return False
+                    return None
                     
                 #no clue what i did here, gl future me
                 argtype = next(x[1] for x in args if (in_arg and x[0] == k) or x[0].startswith("**"))
@@ -228,7 +229,7 @@ class Shell():
 
                 if not is_valid: 
                     cprint(f"[R]Argument '{k}' should be of type {argtype}.")
-                    return False
+                    return None
                 new[k] = output
 
         return new
