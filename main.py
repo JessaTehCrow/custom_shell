@@ -1,5 +1,5 @@
 from utils.cprint import *
-from utils import shell
+from utils import shell as Shell
 from utils import loader
 
 from utils.highlight import *
@@ -12,25 +12,11 @@ import traceback
 import msvcrt
 import os
 import sys
+import time
 
-loader.load()
-
-shell = shell.shell
-
-suggestion = Suggestion(shell)
-suggestion._update_data()
-
-highlight = Highlight(shell)
-highlight._update_data()
-
-default = "[G]$dir$ [E]> [GR] "
-data = shell.loader.load(default, _name="shell")
-
-shell._suggestion = suggestion
-shell._highlight = highlight
 
 text = Text()
-def new_input(prompt:str):
+def new_input(prompt:str, highlight, suggestion):
     print(prompt, end="")
     x,y = get_cursor()
 
@@ -90,19 +76,34 @@ def new_input(prompt:str):
         move_cursor(x,y)
         print(colored2, end='')
 
-
         text.text = text.text.replace('\\\\', '\\')
         text.old_text = max([decolor(suggest), text.text], key=len)
         sys.stdout.flush()
 
-if __name__ == "__main__":
+def main():
+    loader.load()
+
+    shell = Shell.shell
+
+    suggestion = Suggestion(shell)
+    suggestion._update_data()
+
+    highlight = Highlight(shell)
+    highlight._update_data()
+
+    default = "[G]$dir$ [E]> [GR] "
+    data = shell.loader.load(default, _name="shell")
+
+    shell._suggestion = suggestion
+    shell._highlight = highlight
+
     run = 0
     while 1:
         try:
             text.text = ''
             text.text_offset = 0
 
-            cmd = new_input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))))
+            cmd = new_input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))), highlight, suggestion)
 
             if len(cmd)==0:
                 continue
@@ -113,17 +114,25 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             print()
 
-        except:
-            cprint(f"[R]A severe error has occured:\n\n")
 
-            print(traceback.format_exc())
+if __name__ == "__main__":
+    start = time.time()
+    shell = Shell.shell
 
-            if run > 0:
-                cprint(f"\n\n[R]Restarting the shell.")
-                input("Press enter to restart shell")
-                shell.run('modules restart'.split())
+    try:
+        main()
 
-            else:
-                cprint(f"\n\n[R]A startup error is occuring, restarting the shell has no effect")
-                input("Press enter to quit.")
-                exit()
+    except Exception:
+        cprint(f"[R]A severe error has occured:\n\n")
+
+        print(traceback.format_exc())
+
+        if time.time() - start > 10:
+            cprint(f"\n\n[R]Restarting the shell.")
+            input("Press enter to restart shell")
+            shell.run('modules restart'.split())
+
+        else:
+            cprint(f"\n\n[R]A startup error is occuring, restarting the shell has no effect")
+            input("Press enter to quit.")
+            exit()

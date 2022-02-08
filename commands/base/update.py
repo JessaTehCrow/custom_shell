@@ -20,6 +20,8 @@ def test(self):
         current_hash = raw_current_hash.decode()[:-1]
         latest_hash = raw_latest_hash.decode().split()[0]
 
+        info = subprocess.check_output(f'git show {latest_hash} --stat').decode()
+
     except Exception as e:
         print(e)
         return 2
@@ -34,6 +36,8 @@ def test(self):
     cprint("\n[Y][U]There's a new update available, do you want to update?[E]\n")
     cprint(f"[G]Current hash: [E]{current_hash}")
     cprint(f"[G]New hash: [E]{latest_hash}\n")
+    print('\n',info)
+    print('\n')
     update = input(cconvert(" [GR]y [G]/ [R]n [G]> [P]"))
 
     if update.lower() in "y yes ye".split():
