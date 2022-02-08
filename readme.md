@@ -5,23 +5,33 @@ It has custom modules, easy usage and easily customizable.
 
 Join the **[discord](https://discord.gg/ZWFefjGf2g)** server to get help, download modules or upload your own!
 
-## Why
+## Functions
 
-### Why you would want to use it
+- Easy customization
+- Easily add custom commands
+- Command highlighting
+- Command suggestions
+- Tab complete
+- Automatic argument type parser
 
-It looks better and has better customizability. That's really all i can say 
+## Examples
+
+This gif shows the command highlighting, command suggestion, and tab complete
+![GIF_highlight_showoff](images/highlight.gif)
+
+This image shows the code of a custom command.
+As you can see, it also automatically parses if the argument is an int or not!
+![command_code](images/custom_command.png)
+
+
+## Why use it
+
+This shell is made with customization and functionality in mind.
+It allows you to add new commands, change the look of your shell and a lot more within seconds!
+
 
 ### Why i made it
 
 I made this because i personally really didn't like the default windows command prompt.
 So i decided i'd make my own shell that'll be more customizable AND look better.
 This is my third time making a shell, and with that also the best version. 
-
-## Examples
-
-
-This is the initialization of the shell, shown on startup or when refreshing modules.
-![Hi 2](images/init.png?raw=true)
-
-This is help list, showing all modules and usable functions.
-![Hi](images/help.png?raw=true)

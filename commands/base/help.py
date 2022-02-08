@@ -1,5 +1,37 @@
+from operator import mod
 from utils.shell import command
+import inspect
+
 __desc__ = "Get help about modules"
+
+def _main_suggestion(self, args):
+    modules = self.commands.keys()
+    module = ' '.join(args[:1])
+    sub_func = ' '.join(args[1:2])
+
+    found = [x for x in modules if x.startswith(module)]
+
+    space = '' if args else ' '
+    if module in modules:
+        return
+
+    elif found:
+        return True, space + found[0][len(module):]
+
+def _main_highlight(self, args):
+    modules = self.commands.keys()
+    module = ' '.join(args[:1])
+
+    found = [x for x in modules if x.startswith(module)]
+
+    color = '[R][BO][U]'
+    
+    if module in modules:
+        color = '[GR]'
+    elif found:
+        color = '[Y]'
+
+    return [color]*len(args)
 
 @command("Shows help for function", 
 """[B]module [G]is either a [L]buildin command[G], or a [GR]module[G].
@@ -26,10 +58,12 @@ def main(self,module:str=None,function:str=None):
         for i,arg in enumerate(function.args):
             temp = ""
             for it,det in enumerate(arg):
-                if det == None or det=="None": break
+                if det == inspect._empty or det=="_empty": break
                 det = det if it<len(arg)-1 else repr(det)
                 temp += f"{inbt[it]}{cols[it]}{det}"
+
             out.append(['','\n'][(i)%3==0 and i !=0 and len(function.args)>i] + temp)
+
         return "[E]" + '[G], '.join(out)
 
     def print_detailed_help(function):
