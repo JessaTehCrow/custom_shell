@@ -1,6 +1,6 @@
 import subprocess,time,math,sys
 from subprocess import PIPE,STDOUT
-from cprint import c_tabulate, cprint
+from utils.cprint import c_tabulate, cprint
 
 from utils.shell import command, event
 
