@@ -105,7 +105,7 @@ def main():
 
             cmd = new_input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))), highlight, suggestion)
 
-            if len(cmd)==0:
+            if not cmd.split():
                 continue
             
             shell.run(cmd.split())
@@ -127,9 +127,10 @@ if __name__ == "__main__":
 
         print(traceback.format_exc())
 
-        if time.time() - start > 10:
+        if time.time() - start > 3:
             cprint(f"\n\n[R]Restarting the shell.")
             input("Press enter to restart shell")
+            os.chdir(shell.root_path)
             shell.run('modules restart'.split())
 
         else:

@@ -17,7 +17,7 @@ def test(self):
         raw_current_hash = subprocess.check_output('git rev-parse HEAD', stderr=DEVNULL)
         raw_latest_hash = subprocess.check_output('git ls-remote https://github.com/JessaTehCrow/custom_shell.git', stderr=DEVNULL)
 
-        subprocess.check_output('git fetch')
+        subprocess.check_call('git fetch', stdout=DEVNULL, stderr=DEVNULL)
 
         current_hash = raw_current_hash.decode()[:-1]
         latest_hash = raw_latest_hash.decode().split()[0]

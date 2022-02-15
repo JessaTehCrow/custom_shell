@@ -49,6 +49,7 @@ class Text():
         offset = len(self.text) - self.text_offset
         self.text = self.text[:max(0,offset-1)] + self.text[offset:]
 
+
     def _get_perserve_index(self):
         raw = perserve_split(self.text, ' ')
         if not raw.split_string:
@@ -71,6 +72,7 @@ class Text():
                 break
         return index, left
 
+
     def _ctrl_backspace(self, _):
         index, left = self._get_perserve_index()
         if [index,left] == [None, None]:
@@ -85,6 +87,7 @@ class Text():
         
         raw.reset()
         self.text = raw.re_assemble(False)
+
 
     def _arrow(self, key:bytes):
         key = key.decode()

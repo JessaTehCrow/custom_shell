@@ -65,10 +65,12 @@ class Highlight():
             
             if len(f_args) and f_args[-1][0].startswith("*"):
                 l_arg = f_args[-1]
-                if not l_arg[1]:
+
+                if l_arg[1] == '_empty':
                     color = self.colors['text_color']
+
                 else:
-                    correct, _ = types[l_arg[1]](args[i+len(f_args)])
+                    correct, _ = types[l_arg[1]] (args[i+len(f_args)])
                     
                     if correct:
                         color = self.colors[l_arg[1]+"_arg"]
