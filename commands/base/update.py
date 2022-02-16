@@ -4,15 +4,8 @@ from subprocess import DEVNULL
 from utils.shell import command, event
 from utils.cprint import cconvert, cprint
 
-@event("on_shell_ready")
-def test(self):
-    
-    check_update = self.loader.load(True, "do_update")
-
-    if not check_update:
-        cprint("[E]Update check is turned off")
-        return
-
+@command("Check for update")
+def check(self):
     try:
         raw_current_hash = subprocess.check_output('git rev-parse HEAD', stderr=DEVNULL)
         raw_latest_hash = subprocess.check_output('git ls-remote https://github.com/JessaTehCrow/custom_shell.git', stderr=DEVNULL)
@@ -59,6 +52,17 @@ def test(self):
         self.run('modules restart'.split())
     
     cprint('[G]Not updating')
+
+@event("on_shell_ready")
+def test(self):
+    
+    check_update = self.loader.load(True, "do_update")
+
+    if not check_update:
+        cprint("[E]Update check is turned off")
+        return
+
+    check(self)
 
 
 @command("Set update check on or off")
