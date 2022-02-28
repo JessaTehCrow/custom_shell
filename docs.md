@@ -63,7 +63,7 @@ If the first argument of a functoin is `self` the shell will pass itself as an a
 
 Simple example:
 
-```py
+```python
 def some_custom_function(self):
     print("Got the shell object:",self.__name__) # output: `shell`
 ```
@@ -75,7 +75,7 @@ this is handy if you want to add or use things within the shell object itself.
 You can insert certain functions, or classes into the shell, so other modules are able to use them aswell. This can be done fairly easy aswell.
 
 Using the shell object you can do something along the lines of this
-```py
+```python
 # Class definition
 class some_class:
     def __init__(self):
@@ -105,7 +105,7 @@ Once you made this, you can use the command `refresh` to load it into the shell.
 
 **Base**
 To make a functional command, all you need to do is add a function to it.
-```py
+```python
 # new_module.py
 
 def new_command():
@@ -119,7 +119,7 @@ Adding arguments to your commands work the exact same way with normal functions.
 The only difference is that if you use type-hinting for the arguments, the shell will check if those arguments fit the type hints, and will automatically change the argument into the type.
 
 so if i have a function like this:
-```py
+```python
 def double(number : float):
     print(f"The double of {number} is {number*2}")
 ```
@@ -142,7 +142,7 @@ The shell will read all functions within a module, and will look at the name, ar
 
 The help will still need a user-defined help description however.
 This can be added by making a variable named `__help__` within the function. 
-```py
+```python
 def some_example(number : int):
     __help__ = "The variable 'number' is a integer"
     print(number*number)
@@ -152,7 +152,7 @@ This will be added to the detailed help section automatically aswell.
 
 Adding a description is the same as adding a description to a function normally is. This will be shown with the module help. for example `help module` as well as with the detailed help.
 
-```py
+```python
 def some_example(number : int):
     """Prints the input number squared"""
 
@@ -171,7 +171,7 @@ The highlighting by default is done by command arguments.
 Here `example` is the module `test` is the sub-command and `432` is an int-argument
 
 The highlighting is done automatically from function arguments.
-```py
+```python
 def highlight(arg1:int, arg2:str, arg3:bool):
     pass
 ```
@@ -187,7 +187,7 @@ This function will always get the shell object, and the current command argument
 To get this to work, you need to return a list with [Cprint](#cprint) colors with the same length as the arguments given.
 
 Example:
-```py
+```python
 def _get_file_highlight(self, args:list):
     colors = ['[E]']*len(args) # Clear color the length of arguments
     search = ' '.join(args)
@@ -218,7 +218,7 @@ And instead of returning a list of colors, this function needs to return a singl
 `ex` is the user input, and `ample` is the appended suggestion.
 
 example:
-```py
+```python
 def _get_file_suggestion(self, args:list):
     search = ' '.join(args)
     
@@ -273,7 +273,7 @@ This auto-assigning can be over-written by forcefully giving the `_name` a strin
 **Example**
 Here's a full example on how to use the `loader.load` function:
 
-```py
+```python
 # Example module name: loader_test
 
 def main(self):
@@ -352,7 +352,7 @@ This is a slightly more complex function, but still easy to use (i think...)
  Only one value
  ```
 Example above can be replicated with this code
- ```py
+ ```python
 def main(self):
     cprint = self.cprint
 

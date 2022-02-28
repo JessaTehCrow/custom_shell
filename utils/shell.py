@@ -31,7 +31,6 @@ class Shell():
             "on_ready":[]
         }
         self.running = []
-        self.after_load = []
         self.cprint = cpr
 
     def run(self, command:str, help_if_error:bool=True):
@@ -99,7 +98,7 @@ class Shell():
                 return command[0]
 
 
-    def load_kwargs(self,args:list):
+    def _load_kwargs(self,args:list):
         kwargs = {}
         #loop through all args that start with '-'
         for i,x in [[i+1,x] for i,x in enumerate(args) if x.startswith('-')]:
@@ -111,10 +110,10 @@ class Shell():
         return kwargs
 
 
-    def get_args(self,args:list,func):
+    def get_args(self, args:list, func):
         kwargs = {}
 
-        kwargs = self.load_kwargs(args)
+        kwargs = self._load_kwargs(args)
         return ([x for x in args if not x.startswith('-')],kwargs)
 
 
@@ -140,7 +139,7 @@ class Shell():
             return False
 
 
-    def _do_event(self,event:str):
+    def _do_event(self, event:str):
         "Just do the event lol"
         try:
             for x in self.events[event]: 
@@ -165,6 +164,10 @@ class Shell():
                 return args
 
             for x in args:
+                if t_args[0][1] == '_empty':
+                    new.append(x)
+                    continue
+                
                 valid, out = types[t_args[0][1]](x)
                 if not valid:
                     new.append(None)

@@ -34,7 +34,7 @@ class _loader():
             return running.module
         return running.__module__.split('.')[-1]
 
-    def load(self,default,sub:str='main',_name:str=None):
+    def load(self, default, sub:str='main', _name:str=None):
         "Returns json data for module, saves default if it doesn't exist"
         module_name = _name or self._get_module()
 

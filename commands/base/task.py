@@ -19,8 +19,8 @@ def kill(*processes:str):
     found = []
 
     for x in data:
-        if any(y.lower() in x.lower() for y in processes):
-            name,pid,_,_,memory,status,executor,time,title = json.loads(f"[{x}]")
+        name,pid,_,_,memory,status,executor,time,title = json.loads(f"[{x}]")
+        if any(any(y.lower() in str(z).lower() for z in [name, pid, title]) for y in processes):
             found.append([name,pid,memory,status,executor,time,title])
     
     titles = "Name,Pid,Memory,Status,Executor,Cpu Time,Title".split(',')
