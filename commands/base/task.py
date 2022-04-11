@@ -19,7 +19,15 @@ def kill(*processes:str):
     found = []
 
     for x in data:
+<<<<<<< HEAD
         name,pid,_,_,memory,status,executor,time,title = json.loads(f"[{x}]", strict=False)
+=======
+        try:
+            name,pid,_,_,memory,status,executor,time,title = json.loads(f"[{x}]", strict=False)
+        except Exception:
+            continue
+        
+>>>>>>> 773aeccc692ac9d7c148ec664ee69fb466c6c69f
         if any(any(y.lower() in str(z).lower() for z in [name, pid, title]) for y in processes):
             found.append([name,pid,memory,status,executor,time,title])
     
