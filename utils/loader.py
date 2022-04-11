@@ -5,7 +5,7 @@ import importlib
 
 from utils.shell import shell
 from sys import stdout as std
-from cprint import cconvert, cprint
+from utils.cprint import cconvert, cprint
 
 
 paths = [

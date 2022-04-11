@@ -238,7 +238,7 @@ class Shell():
         return new
 
 
-shell = Shell()
+shell:Shell = Shell()
 
 
 def _get_module(stack):
