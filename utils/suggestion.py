@@ -27,6 +27,7 @@ class Suggestion():
         out = [f"{'!' if x[2] == 'None' else ''}{x[0]}" for x in f_args[len(args):]]
         return False, ' '+', '.join(out)
 
+
     def _get_sub(self, module:str, args:list):
         funcs = self._get_functions(module)
 
@@ -63,6 +64,7 @@ class Suggestion():
             
             elif cmd in self.modules and sub in self._get_functions(cmd):
                 return self._get_args(cmd, sub, command[2:])
+
 
     def get(self, command:list):
         if not command:
