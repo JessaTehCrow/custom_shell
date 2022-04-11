@@ -19,7 +19,7 @@ def kill(*processes:str):
     found = []
 
     for x in data:
-        name,pid,_,_,memory,status,executor,time,title = json.loads(f"[{x}]")
+        name,pid,_,_,memory,status,executor,time,title = json.loads(f"[{x}]", strict=False)
         if any(any(y.lower() in str(z).lower() for z in [name, pid, title]) for y in processes):
             found.append([name,pid,memory,status,executor,time,title])
     
@@ -28,6 +28,8 @@ def kill(*processes:str):
     c_tabulate(found, titles, cols=cols, title_cols=cols)
     
     print('')
+    if not found:
+        return
 
     do = input(cconvert(f"[R]Do you want to kill these processes? [G](Y/N): [Y]"))
     while do.lower() not in ['y','n']:

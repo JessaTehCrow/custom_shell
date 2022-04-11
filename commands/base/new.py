@@ -82,4 +82,20 @@ def new(self, type:str,name:str,hidden:bool=False):
         return 1
         
     if hidden:
-        hide(name,True)
+        hide(name, True)
+
+@command("Make file")
+def file(self, name:str, hidden:bool=False):
+    with open(name,'w'):
+        self.cprint.cprint(f'[GR]Succesfully made file')
+    
+    if hidden:
+        hide(name, True)
+
+@command("Make folder")
+def folder(self, name:str, hidden:bool=False):
+    os.mkdir(name)
+    self.cprint.cprint(f'[GR]Succesfully made folder')
+    
+    if hidden:
+        hide(name, True)
