@@ -39,6 +39,7 @@ This is my third time making a shell, and with that also the best version.
 
 ## TODO
 
+- Fix auto-update to actually work propperly
 - Fix and add more documentation
 - Fix color bug when typing in a backslash
 - Find more bugs so i can fix them
