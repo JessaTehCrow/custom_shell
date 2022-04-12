@@ -116,7 +116,7 @@ class perserve_split():
 
         return out
     
-    def re_assemble(self, apply_end:bool=True) -> str:
+    def re_assemble(self, apply_end:bool=True, assemble_offset=0) -> str:
         output = list(self._raw_split)
         if not self._raw_split:
             return ''
@@ -131,4 +131,4 @@ class perserve_split():
             else:
                 output[max(0, i*2-offset)] = self.colors[i-offset] + self.split_string[i-offset] + end_color
 
-        return ''.join(x if isinstance(x,str) else " "*x for x in output)
+        return ''.join(x if isinstance(x,str) else " "*x for x in output[assemble_offset:])

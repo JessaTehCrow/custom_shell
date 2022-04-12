@@ -3,7 +3,7 @@ import os, sys
 import importlib
 
 from utils import loader
-from utils.shell import command
+from utils.shell import command, Shell
 
 __desc__ = "Reload or refresh commands"
 
@@ -72,7 +72,8 @@ def reload(self, module:str):
 
 
 @command("Restart shell completely")
-def restart(self):
+def restart(self:Shell):
+    os.chdir(self.root_path)
     path = sys.path[0] + '/main.py'
 
     os.execl(sys.executable, 'python', path)

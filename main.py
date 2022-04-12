@@ -16,7 +16,7 @@ import time
 
 
 text = Text()
-def new_input(prompt:str, highlight, suggestion):
+def new_input(prompt:str, highlight, suggestion, text:Text, _old=""):
     print(prompt, end="")
     x,y = get_cursor()
 
@@ -28,18 +28,24 @@ def new_input(prompt:str, highlight, suggestion):
 
         elif key == b"\r": # Enter
             print()
+            if text.text[-2:] in [' ^']: # `\` will be added later
+                out = text.text[:-1] + new_input(cconvert("[G]: "), highlight, suggestion, Text(), _old+text.text[:-1])
+                text.history.insert(0, out)
+                return out
+
             if text.text.strip() != '' and ( (text.history and text.history[0] != text.text) or (len(text.history)==0) ):
                 text.history.insert(0, text.text)
 
             text.history_offset = -1
+                
             return text.text
 
         elif key == b'\t': # Tab
-            split = perserve_split(text.text, ' ')
+            split = perserve_split(_old+text.text, ' ')
             can_tab, suggest = suggestion.get(split.split_string)
 
             if suggest and can_tab:
-                text.text = split.re_assemble(False).rstrip() + suggest
+                text.text = split.re_assemble(False, len(perserve_split(_old, ' ')._raw_split)).rstrip() + suggest
 
         else:
             text.do_action(key)
@@ -48,12 +54,12 @@ def new_input(prompt:str, highlight, suggestion):
         text.text = text.text.replace('\\', '\\\\')
         text.text = escape(text.text)
 
-        split_text = perserve_split(text.text, ' ')
+        split_text = perserve_split(_old + text.text, ' ')
         
         if split_text:
             split_text.colors = highlight.apply(split_text.split_string)
 
-        raw_colored = split_text.re_assemble()
+        raw_colored = split_text.re_assemble(assemble_offset=len(perserve_split(_old, ' ')._raw_split))
         colored = cconvert(raw_colored).replace('\\\\', '\\')
 
         # Get suggestione
@@ -103,7 +109,7 @@ def main():
             text.text = ''
             text.text_offset = 0
 
-            cmd = new_input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))), highlight, suggestion)
+            cmd = new_input(cconvert(data.replace("$dir$",os.getcwd().replace("\\","/"))), highlight, suggestion, text)
 
             if not cmd.split():
                 continue
