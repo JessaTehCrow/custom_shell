@@ -1,11 +1,14 @@
-import subprocess
+import subprocess, os
 
 from subprocess import DEVNULL
-from utils.shell import command, event
+from utils.shell import command, event, Shell
 from utils.cprint import cconvert, cprint
 
 @command("Check for update")
-def check(self):
+def check(self:Shell):
+    current_dir = os.getcwd()
+    os.chdir(self.root_path)
+
     try:
         raw_current_hash = subprocess.check_output('git rev-parse HEAD', stderr=DEVNULL)
         raw_latest_hash = subprocess.check_output('git ls-remote https://github.com/JessaTehCrow/custom_shell.git', stderr=DEVNULL)
@@ -52,6 +55,7 @@ def check(self):
         self.run('modules restart'.split())
     
     cprint('[G]Not updating')
+    os.chdir(current_dir)
 
 @event("on_shell_ready")
 def test(self):
